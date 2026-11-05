@@ -1,0 +1,174 @@
+{
+  "version": 4,
+  "targets": {
+    "netstandard2.1": {
+      "Unity.StarterAssets/1.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v2.1",
+        "compile": {
+          "bin/placeholder/Unity.StarterAssets.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Unity.StarterAssets.dll": {}
+        }
+      },
+      "Unity.StarterAssets.Editor/1.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v2.1",
+        "dependencies": {
+          "Unity.StarterAssets": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/Unity.StarterAssets.Editor.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Unity.StarterAssets.Editor.dll": {}
+        }
+      },
+      "UnityTechnologies.ParticlePack/1.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v2.1",
+        "compile": {
+          "bin/placeholder/UnityTechnologies.ParticlePack.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/UnityTechnologies.ParticlePack.dll": {}
+        }
+      },
+      "UnityTechnologies.ParticlePack.Editor/1.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v2.1",
+        "dependencies": {
+          "UnityTechnologies.ParticlePack": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/UnityTechnologies.ParticlePack.Editor.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/UnityTechnologies.ParticlePack.Editor.dll": {}
+        }
+      },
+      "URPWizard/1.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v2.1",
+        "compile": {
+          "bin/placeholder/URPWizard.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/URPWizard.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Unity.StarterAssets/1.0.0": {
+      "type": "project",
+      "path": "Unity.StarterAssets.csproj",
+      "msbuildProject": "Unity.StarterAssets.csproj"
+    },
+    "Unity.StarterAssets.Editor/1.0.0": {
+      "type": "project",
+      "path": "Unity.StarterAssets.Editor.csproj",
+      "msbuildProject": "Unity.StarterAssets.Editor.csproj"
+    },
+    "UnityTechnologies.ParticlePack/1.0.0": {
+      "type": "project",
+      "path": "UnityTechnologies.ParticlePack.csproj",
+      "msbuildProject": "UnityTechnologies.ParticlePack.csproj"
+    },
+    "UnityTechnologies.ParticlePack.Editor/1.0.0": {
+      "type": "project",
+      "path": "UnityTechnologies.ParticlePack.Editor.csproj",
+      "msbuildProject": "UnityTechnologies.ParticlePack.Editor.csproj"
+    },
+    "URPWizard/1.0.0": {
+      "type": "project",
+      "path": "URPWizard.csproj",
+      "msbuildProject": "URPWizard.csproj"
+    }
+  },
+  "projectFileDependencyGroups": {
+    "netstandard2.1": [
+      "URPWizard >= 1.0.0",
+      "Unity.StarterAssets >= 1.0.0",
+      "Unity.StarterAssets.Editor >= 1.0.0",
+      "UnityTechnologies.ParticlePack >= 1.0.0",
+      "UnityTechnologies.ParticlePack.Editor >= 1.0.0"
+    ]
+  },
+  "packageFolders": {
+    "/Users/nathalyacreer/.nuget/packages/": {}
+  },
+  "project": {
+    "version": "1.0.0",
+    "restore": {
+      "projectUniqueName": "/Users/nathalyacreer/DevOPS/PsychicSim/My project/Assembly-CSharp.csproj",
+      "projectName": "Assembly-CSharp",
+      "projectPath": "/Users/nathalyacreer/DevOPS/PsychicSim/My project/Assembly-CSharp.csproj",
+      "packagesPath": "/Users/nathalyacreer/.nuget/packages/",
+      "outputPath": "/Users/nathalyacreer/DevOPS/PsychicSim/My project/Temp/obj/Assembly-CSharp/",
+      "projectStyle": "PackageReference",
+      "configFilePaths": [
+        "/Users/nathalyacreer/.nuget/NuGet/NuGet.Config"
+      ],
+      "originalTargetFrameworks": [
+        "netstandard2.1"
+      ],
+      "sources": {
+        "https://api.nuget.org/v3/index.json": {}
+      },
+      "frameworks": {
+        "netstandard2.1": {
+          "framework": "netstandard2.1",
+          "targetAlias": "netstandard2.1",
+          "projectReferences": {
+            "/Users/nathalyacreer/DevOPS/PsychicSim/My project/Unity.StarterAssets.csproj": {
+              "projectPath": "/Users/nathalyacreer/DevOPS/PsychicSim/My project/Unity.StarterAssets.csproj"
+            },
+            "/Users/nathalyacreer/DevOPS/PsychicSim/My project/Unity.StarterAssets.Editor.csproj": {
+              "projectPath": "/Users/nathalyacreer/DevOPS/PsychicSim/My project/Unity.StarterAssets.Editor.csproj"
+            },
+            "/Users/nathalyacreer/DevOPS/PsychicSim/My project/UnityTechnologies.ParticlePack.csproj": {
+              "projectPath": "/Users/nathalyacreer/DevOPS/PsychicSim/My project/UnityTechnologies.ParticlePack.csproj"
+            },
+            "/Users/nathalyacreer/DevOPS/PsychicSim/My project/UnityTechnologies.ParticlePack.Editor.csproj": {
+              "projectPath": "/Users/nathalyacreer/DevOPS/PsychicSim/My project/UnityTechnologies.ParticlePack.Editor.csproj"
+            },
+            "/Users/nathalyacreer/DevOPS/PsychicSim/My project/URPWizard.csproj": {
+              "projectPath": "/Users/nathalyacreer/DevOPS/PsychicSim/My project/URPWizard.csproj"
+            }
+          }
+        }
+      },
+      "warningProperties": {
+        "warnAsError": [
+          "NU1605"
+        ]
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "true",
+        "auditLevel": "low",
+        "auditMode": "direct"
+      },
+      "SdkAnalysisLevel": "10.0.400"
+    },
+    "frameworks": {
+      "netstandard2.1": {
+        "framework": "netstandard2.1",
+        "targetAlias": "netstandard2.1",
+        "imports": [
+          "net461",
+          "net462",
+          "net47",
+          "net471",
+          "net472",
+          "net48",
+          "net481"
+        ],
+        "assetTargetFallback": true,
+        "warn": true,
+        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/10.0.401/RuntimeIdentifierGraph.json"
+      }
+    }
+  }
+}

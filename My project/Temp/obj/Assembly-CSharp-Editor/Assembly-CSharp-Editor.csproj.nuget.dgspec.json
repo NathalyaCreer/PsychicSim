@@ -1,0 +1,443 @@
+{
+  "format": 1,
+  "restore": {
+    "/Users/nathalyacreer/DevOPS/PsychicSim/My project/Assembly-CSharp-Editor.csproj": {}
+  },
+  "projects": {
+    "/Users/nathalyacreer/DevOPS/PsychicSim/My project/Assembly-CSharp-Editor.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/nathalyacreer/DevOPS/PsychicSim/My project/Assembly-CSharp-Editor.csproj",
+        "projectName": "Assembly-CSharp-Editor",
+        "projectPath": "/Users/nathalyacreer/DevOPS/PsychicSim/My project/Assembly-CSharp-Editor.csproj",
+        "packagesPath": "/Users/nathalyacreer/.nuget/packages/",
+        "outputPath": "/Users/nathalyacreer/DevOPS/PsychicSim/My project/Temp/obj/Assembly-CSharp-Editor/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/nathalyacreer/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "netstandard2.1"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "netstandard2.1": {
+            "framework": "netstandard2.1",
+            "targetAlias": "netstandard2.1",
+            "projectReferences": {
+              "/Users/nathalyacreer/DevOPS/PsychicSim/My project/Assembly-CSharp.csproj": {
+                "projectPath": "/Users/nathalyacreer/DevOPS/PsychicSim/My project/Assembly-CSharp.csproj"
+              },
+              "/Users/nathalyacreer/DevOPS/PsychicSim/My project/Unity.StarterAssets.csproj": {
+                "projectPath": "/Users/nathalyacreer/DevOPS/PsychicSim/My project/Unity.StarterAssets.csproj"
+              },
+              "/Users/nathalyacreer/DevOPS/PsychicSim/My project/Unity.StarterAssets.Editor.csproj": {
+                "projectPath": "/Users/nathalyacreer/DevOPS/PsychicSim/My project/Unity.StarterAssets.Editor.csproj"
+              },
+              "/Users/nathalyacreer/DevOPS/PsychicSim/My project/UnityTechnologies.ParticlePack.csproj": {
+                "projectPath": "/Users/nathalyacreer/DevOPS/PsychicSim/My project/UnityTechnologies.ParticlePack.csproj"
+              },
+              "/Users/nathalyacreer/DevOPS/PsychicSim/My project/UnityTechnologies.ParticlePack.Editor.csproj": {
+                "projectPath": "/Users/nathalyacreer/DevOPS/PsychicSim/My project/UnityTechnologies.ParticlePack.Editor.csproj"
+              },
+              "/Users/nathalyacreer/DevOPS/PsychicSim/My project/URPWizard.csproj": {
+                "projectPath": "/Users/nathalyacreer/DevOPS/PsychicSim/My project/URPWizard.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "10.0.400"
+      },
+      "frameworks": {
+        "netstandard2.1": {
+          "framework": "netstandard2.1",
+          "targetAlias": "netstandard2.1",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/10.0.401/RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/Users/nathalyacreer/DevOPS/PsychicSim/My project/Assembly-CSharp.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/nathalyacreer/DevOPS/PsychicSim/My project/Assembly-CSharp.csproj",
+        "projectName": "Assembly-CSharp",
+        "projectPath": "/Users/nathalyacreer/DevOPS/PsychicSim/My project/Assembly-CSharp.csproj",
+        "packagesPath": "/Users/nathalyacreer/.nuget/packages/",
+        "outputPath": "/Users/nathalyacreer/DevOPS/PsychicSim/My project/Temp/obj/Assembly-CSharp/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/nathalyacreer/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "netstandard2.1"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "netstandard2.1": {
+            "framework": "netstandard2.1",
+            "targetAlias": "netstandard2.1",
+            "projectReferences": {
+              "/Users/nathalyacreer/DevOPS/PsychicSim/My project/Unity.StarterAssets.csproj": {
+                "projectPath": "/Users/nathalyacreer/DevOPS/PsychicSim/My project/Unity.StarterAssets.csproj"
+              },
+              "/Users/nathalyacreer/DevOPS/PsychicSim/My project/Unity.StarterAssets.Editor.csproj": {
+                "projectPath": "/Users/nathalyacreer/DevOPS/PsychicSim/My project/Unity.StarterAssets.Editor.csproj"
+              },
+              "/Users/nathalyacreer/DevOPS/PsychicSim/My project/UnityTechnologies.ParticlePack.csproj": {
+                "projectPath": "/Users/nathalyacreer/DevOPS/PsychicSim/My project/UnityTechnologies.ParticlePack.csproj"
+              },
+              "/Users/nathalyacreer/DevOPS/PsychicSim/My project/UnityTechnologies.ParticlePack.Editor.csproj": {
+                "projectPath": "/Users/nathalyacreer/DevOPS/PsychicSim/My project/UnityTechnologies.ParticlePack.Editor.csproj"
+              },
+              "/Users/nathalyacreer/DevOPS/PsychicSim/My project/URPWizard.csproj": {
+                "projectPath": "/Users/nathalyacreer/DevOPS/PsychicSim/My project/URPWizard.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "10.0.400"
+      },
+      "frameworks": {
+        "netstandard2.1": {
+          "framework": "netstandard2.1",
+          "targetAlias": "netstandard2.1",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/10.0.401/RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/Users/nathalyacreer/DevOPS/PsychicSim/My project/Unity.StarterAssets.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/nathalyacreer/DevOPS/PsychicSim/My project/Unity.StarterAssets.csproj",
+        "projectName": "Unity.StarterAssets",
+        "projectPath": "/Users/nathalyacreer/DevOPS/PsychicSim/My project/Unity.StarterAssets.csproj",
+        "packagesPath": "/Users/nathalyacreer/.nuget/packages/",
+        "outputPath": "/Users/nathalyacreer/DevOPS/PsychicSim/My project/Temp/obj/Unity.StarterAssets/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/nathalyacreer/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "netstandard2.1"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "netstandard2.1": {
+            "framework": "netstandard2.1",
+            "targetAlias": "netstandard2.1",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "10.0.400"
+      },
+      "frameworks": {
+        "netstandard2.1": {
+          "framework": "netstandard2.1",
+          "targetAlias": "netstandard2.1",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/10.0.401/RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/Users/nathalyacreer/DevOPS/PsychicSim/My project/Unity.StarterAssets.Editor.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/nathalyacreer/DevOPS/PsychicSim/My project/Unity.StarterAssets.Editor.csproj",
+        "projectName": "Unity.StarterAssets.Editor",
+        "projectPath": "/Users/nathalyacreer/DevOPS/PsychicSim/My project/Unity.StarterAssets.Editor.csproj",
+        "packagesPath": "/Users/nathalyacreer/.nuget/packages/",
+        "outputPath": "/Users/nathalyacreer/DevOPS/PsychicSim/My project/Temp/obj/Unity.StarterAssets.Editor/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/nathalyacreer/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "netstandard2.1"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "netstandard2.1": {
+            "framework": "netstandard2.1",
+            "targetAlias": "netstandard2.1",
+            "projectReferences": {
+              "/Users/nathalyacreer/DevOPS/PsychicSim/My project/Unity.StarterAssets.csproj": {
+                "projectPath": "/Users/nathalyacreer/DevOPS/PsychicSim/My project/Unity.StarterAssets.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "10.0.400"
+      },
+      "frameworks": {
+        "netstandard2.1": {
+          "framework": "netstandard2.1",
+          "targetAlias": "netstandard2.1",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/10.0.401/RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/Users/nathalyacreer/DevOPS/PsychicSim/My project/UnityTechnologies.ParticlePack.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/nathalyacreer/DevOPS/PsychicSim/My project/UnityTechnologies.ParticlePack.csproj",
+        "projectName": "UnityTechnologies.ParticlePack",
+        "projectPath": "/Users/nathalyacreer/DevOPS/PsychicSim/My project/UnityTechnologies.ParticlePack.csproj",
+        "packagesPath": "/Users/nathalyacreer/.nuget/packages/",
+        "outputPath": "/Users/nathalyacreer/DevOPS/PsychicSim/My project/Temp/obj/UnityTechnologies.ParticlePack/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/nathalyacreer/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "netstandard2.1"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "netstandard2.1": {
+            "framework": "netstandard2.1",
+            "targetAlias": "netstandard2.1",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "10.0.400"
+      },
+      "frameworks": {
+        "netstandard2.1": {
+          "framework": "netstandard2.1",
+          "targetAlias": "netstandard2.1",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/10.0.401/RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/Users/nathalyacreer/DevOPS/PsychicSim/My project/UnityTechnologies.ParticlePack.Editor.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/nathalyacreer/DevOPS/PsychicSim/My project/UnityTechnologies.ParticlePack.Editor.csproj",
+        "projectName": "UnityTechnologies.ParticlePack.Editor",
+        "projectPath": "/Users/nathalyacreer/DevOPS/PsychicSim/My project/UnityTechnologies.ParticlePack.Editor.csproj",
+        "packagesPath": "/Users/nathalyacreer/.nuget/packages/",
+        "outputPath": "/Users/nathalyacreer/DevOPS/PsychicSim/My project/Temp/obj/UnityTechnologies.ParticlePack.Editor/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/nathalyacreer/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "netstandard2.1"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "netstandard2.1": {
+            "framework": "netstandard2.1",
+            "targetAlias": "netstandard2.1",
+            "projectReferences": {
+              "/Users/nathalyacreer/DevOPS/PsychicSim/My project/UnityTechnologies.ParticlePack.csproj": {
+                "projectPath": "/Users/nathalyacreer/DevOPS/PsychicSim/My project/UnityTechnologies.ParticlePack.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "10.0.400"
+      },
+      "frameworks": {
+        "netstandard2.1": {
+          "framework": "netstandard2.1",
+          "targetAlias": "netstandard2.1",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/10.0.401/RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/Users/nathalyacreer/DevOPS/PsychicSim/My project/URPWizard.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/nathalyacreer/DevOPS/PsychicSim/My project/URPWizard.csproj",
+        "projectName": "URPWizard",
+        "projectPath": "/Users/nathalyacreer/DevOPS/PsychicSim/My project/URPWizard.csproj",
+        "packagesPath": "/Users/nathalyacreer/.nuget/packages/",
+        "outputPath": "/Users/nathalyacreer/DevOPS/PsychicSim/My project/Temp/obj/URPWizard/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/nathalyacreer/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "netstandard2.1"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "netstandard2.1": {
+            "framework": "netstandard2.1",
+            "targetAlias": "netstandard2.1",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "10.0.400"
+      },
+      "frameworks": {
+        "netstandard2.1": {
+          "framework": "netstandard2.1",
+          "targetAlias": "netstandard2.1",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/10.0.401/RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}
