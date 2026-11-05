@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5bc8c47f58dfb4962825fe070e339ff9, type: 3}
+  m_Name: DemonologyPageUnlock
+  m_EditorClassIdentifier: Assembly-CSharp::SkillTreeNode
+  nodeId: demonologyPageUnlock
+  displayName: New World
+  description: There's gotta be a better way to handle possessed customers...
+  reputationPointCost: 4
+  prerequisites:
+  - {fileID: 11400000, guid: 4de76ed5dbd58463a83ed505bb6d3831, type: 2}
+  upgradeType: 0
+  hotbarSlotNumber: 3

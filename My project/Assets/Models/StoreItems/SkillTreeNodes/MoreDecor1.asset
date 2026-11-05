@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5bc8c47f58dfb4962825fe070e339ff9, type: 3}
+  m_Name: MoreDecor1
+  m_EditorClassIdentifier: Assembly-CSharp::SkillTreeNode
+  nodeId: moreDecor1
+  displayName: Style Magazine
+  description: who knew there was more to decor? More decorating options in store.
+  reputationPointCost: 3
+  prerequisites:
+  - {fileID: 11400000, guid: 119a9b08174bf46999983ab3335ea822, type: 2}
+  - {fileID: 11400000, guid: 9597df37f20fe4f989905001f75740d6, type: 2}
+  - {fileID: 11400000, guid: 7ac4c68e0ad1e49f1a757bbf45a5f3e6, type: 2}
+  upgradeType: 0
+  hotbarSlotNumber: 3
