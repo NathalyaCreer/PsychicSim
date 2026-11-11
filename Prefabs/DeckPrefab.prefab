@@ -1,0 +1,159 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1218640971498795999
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 802931408601894551}
+  - component: {fileID: 8599093467228121612}
+  - component: {fileID: 9162098133180901936}
+  - component: {fileID: 6267405942399459174}
+  - component: {fileID: 6229305430461760860}
+  m_Layer: 10
+  m_Name: DeckPrefab
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &802931408601894551
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1218640971498795999}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1.639, y: 0.7608, z: 7.266}
+  m_LocalScale: {x: 0.0945126, y: 0.02945594, z: 0.14957863}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &8599093467228121612
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1218640971498795999}
+  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!23 &9162098133180901936
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1218640971498795999}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!65 &6267405942399459174
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1218640971498795999}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &6229305430461760860
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1218640971498795999}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 20ec53a4ef3ca417d95e8e5231b46600, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ReadingCards
+  deckReadingType: 0
+  deckCards:
+  - {fileID: 11400000, guid: 6eea7e66f55204900b466004b839e388, type: 2}
+  - {fileID: 11400000, guid: b9b6cce691a5241739b3cbdb068dbda6, type: 2}
+  - {fileID: 11400000, guid: 4dc009db33a2d484b9b7846ce773cfc4, type: 2}
+  - {fileID: 11400000, guid: a8005ac18095040cc9a645385159ecb9, type: 2}
+  - {fileID: 11400000, guid: 321c50c63c7704b79816b6fc0faf9120, type: 2}
+  - {fileID: 11400000, guid: 531c75af5a8a247f6be343a6c41f4bad, type: 2}
+  - {fileID: 11400000, guid: 9c79f926e0eec47739d15df78c18bcbd, type: 2}
+  - {fileID: 11400000, guid: 60ea98d07effe4e5d94e29e5753017c5, type: 2}
+  - {fileID: 11400000, guid: 833467eb0359f455da28dea6c8ce5482, type: 2}
+  - {fileID: 11400000, guid: b831348aae8d647abbee1d3089819d44, type: 2}
+  - {fileID: 11400000, guid: 8401e8eb924d7418f86cf26817b5872e, type: 2}
+  - {fileID: 11400000, guid: 8419aa5c47230463a85a30e90bc42832, type: 2}
+  readingTypePanel: {fileID: 0}
+  loveButton: {fileID: 0}
+  wealthButton: {fileID: 0}
+  healthButton: {fileID: 0}
+  cardPrefab: {fileID: 1897641495381894232, guid: c88d307f59e8d4122bef8201c5f7add3, type: 3}
+  cardGridAnchor: {fileID: 0}
+  selectedRowAnchor: {fileID: 0}
+  columns: 4
+  rows: 3
+  gridSpacingX: 0.18
+  gridSpacingZ: 0.2
+  selectedSpacingX: 0.2
+  moveToSelectedRowDuration: 0.5
+  combinedMeaningText: {fileID: 0}
+  resetDelay: 10
+  cardsToSelect: 3
+  cardFlipDuration: 0.5
+  waitingCustomer: {fileID: 0}
