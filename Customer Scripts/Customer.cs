@@ -794,6 +794,7 @@ public class Customer : MonoBehaviour
 
         if (checkoutUI != null)
         {
+            
             checkoutUI.BeginCheckout(this);
         }
         else

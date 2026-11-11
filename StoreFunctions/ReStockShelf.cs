@@ -3,6 +3,10 @@ using UnityEngine;
 
 public class ReStockShelf : MonoBehaviour
 {
+    
+    [Header("Customer Shopping ")]
+    [SerializeField] private Transform shoppingStop;
+
     [Header("Shelf")]
     public Transform[] shelfPositions;
     public GameObject productPrefab;
@@ -47,6 +51,21 @@ public class ReStockShelf : MonoBehaviour
 
             if (currentProductType == null && dropped != null)
                 currentProductType = dropped.ProductData;
+        }
+        // Register this shelf as a customer shopping destination.
+        if (shoppingStop == null)
+            shoppingStop = transform.Find("ShoppingStop");
+
+        if (shoppingStop != null && CustomerSpawner.Instance != null)
+        {
+            CustomerSpawner.Instance.RegisterShoppingStop(shoppingStop);
+        }
+        else
+        {
+            Debug.LogWarning(
+                $"{name}: No shopping stop assigned or CustomerSpawner missing.",
+                this
+            );
         }
     }
 
@@ -279,5 +298,13 @@ public class ReStockShelf : MonoBehaviour
         currentProductType = null;
 
         Debug.Log($"{name}: All stored products were destroyed by fire.", this);
+    }
+
+    private void OnDestroy()
+    {
+        if (CustomerSpawner.Instance != null && shoppingStop != null)
+        {
+            CustomerSpawner.Instance.UnregisterShoppingStop(shoppingStop);
+        }
     }
 }

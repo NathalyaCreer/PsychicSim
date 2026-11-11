@@ -30,18 +30,51 @@ public class PlayerPickupDrop : MonoBehaviour
     private FireExtinguisherSpray previouslyHeldExtinguisher;
 
 
+
     private void Update()
     {
-        // Q opens the product box currently held by the player.
-        if (Input.GetKeyDown(KeyCode.Q))
+        FurniturePlacementManager placementManager =
+            FurniturePlacementManager.Instance;
+
+        // HANDLE FURNITURE PLACEMENT INPUT
+        if (placementManager != null &&
+            placementManager.IsPlacementActive)
         {
-            OpenHeldProductBox();
+            // Q rotates furniture.
+            if (Input.GetKeyDown(KeyCode.Q))
+            {
+                Debug.Log("PlayerPickupDrop: Rotating furniture.");
+                placementManager.RotatePlacement();
+            }
+
+            // Right-click confirms placement.
+            if (Input.GetMouseButtonDown(1))
+            {
+                Debug.Log("PlayerPickupDrop: Confirming furniture placement.");
+                placementManager.ConfirmPlacementInput();
+            }
+
+            // Escape cancels placement.
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                Debug.Log("PlayerPickupDrop: Cancelling furniture placement.");
+                placementManager.CancelPlacementInput();
+            }
+
+            // Don't execute normal player interactions during placement.
+            return;
         }
 
-        // Update extinguisher spray continuously while E is held.
+        // NORMAL PLAYER INPUT
+        if (Input.GetKeyDown(KeyCode.Q))
+            OpenHeldProductBox();
+
         UpdateHeldTool();
 
-        // Handle E only once per press.
+        // Right-click moves furniture while holding the hammer.
+        if (Input.GetMouseButtonDown(1))
+            TryStartFurnitureMove();
+
         if (Input.GetKeyDown(KeyCode.E))
         {
             if (TryStartBagging())
@@ -50,7 +83,6 @@ public class PlayerPickupDrop : MonoBehaviour
             HandleSingleEInteraction();
         }
 
-        // Cancel bagging if E is released before it completes.
         if (Input.GetKeyUp(KeyCode.E))
         {
             if (baggingCoroutine != null)
@@ -396,6 +428,101 @@ public class PlayerPickupDrop : MonoBehaviour
 
         Debug.Log("Hammer: No damaged furniture found in front of player.");
         return null;
+    }
+
+    public bool BeginBoxPlacement(ProductBox box, out int originalSlot)
+    {
+        originalSlot = -1;
+
+        if (box == null || hotbar == null)
+            return false;
+
+        ObjectGrabbable held = HeldObject;
+
+        if (held == null || held.GetComponent<ProductBox>() != box)
+            return false;
+
+        return hotbar.TemporarilyRemoveHeldItem(
+            held,
+            out originalSlot
+        );
+    }
+
+    public void CompleteBoxPlacement()
+    {
+        if (hotbar != null)
+            hotbar.SetSelectionLocked(false);
+    }
+
+    public void CancelBoxPlacement(ProductBox box, int originalSlot)
+    {
+        if (box == null || hotbar == null)
+        {
+            if (hotbar != null)
+                hotbar.SetSelectionLocked(false);
+
+            return;
+        }
+
+        ObjectGrabbable boxObject = box.GetComponent<ObjectGrabbable>();
+
+        if (boxObject != null)
+        {
+            if (!hotbar.RestoreTemporarilyRemovedItem(
+                boxObject,
+                originalSlot))
+            {
+                hotbar.SetSelectionLocked(false);
+            }
+        }
+        else
+        {
+            hotbar.SetSelectionLocked(false);
+            Debug.LogWarning(
+                "The delivery box needs an ObjectGrabbable component to return to the hotbar.",
+                box
+            );
+        }
+    }
+
+    private void TryStartFurnitureMove()
+    {
+        ObjectGrabbable held = HeldObject;
+
+        if (held == null)
+            return;
+
+        HammerTool hammer = held.GetComponentInChildren<HammerTool>();
+
+        if (hammer == null)
+            return;
+
+        if (playerCameraTransform == null)
+            return;
+
+        Ray ray = new Ray(
+            playerCameraTransform.position,
+            playerCameraTransform.forward
+        );
+
+        if (!Physics.Raycast(
+            ray,
+            out RaycastHit hit,
+            hammerRepairDistance,
+            ~0,
+            QueryTriggerInteraction.Ignore))
+            return;
+
+        PlaceableFurniture furniture =
+            hit.collider.GetComponentInParent<PlaceableFurniture>();
+
+        if (furniture == null)
+            return;
+
+        if (FurniturePlacementManager.Instance != null)
+        {
+            FurniturePlacementManager.Instance.BeginMovingFurniture(furniture);
+        }
     }
 
 

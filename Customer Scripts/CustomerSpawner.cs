@@ -6,6 +6,8 @@ using UnityEngine.AI;
 
 public class CustomerSpawner : MonoBehaviour
 {
+    public static CustomerSpawner Instance { get; private set; }
+
     [Header("Spawning")]
     [SerializeField] private Customer customerPrefab;
     [SerializeField] private Transform spawnPoint;
@@ -37,8 +39,31 @@ public class CustomerSpawner : MonoBehaviour
     [Header("Reputation")]
     [SerializeField] private ReputationSystem reputationSystem;
 
-    private readonly List<Customer> activeCustomers =
-        new List<Customer>();
+
+    private readonly List<Transform> registeredShoppingStops = new List<Transform>();
+    private readonly List<Customer> activeCustomers = new List<Customer>();
+
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+
+        registeredShoppingStops.Clear();
+
+        if (shoppingStops == null)
+            return;
+
+        foreach (Transform stop in shoppingStops)
+        {
+            if (stop != null && !registeredShoppingStops.Contains(stop))
+                registeredShoppingStops.Add(stop);
+        }
+    }
 
     private void Start()
     {
@@ -121,7 +146,7 @@ public class CustomerSpawner : MonoBehaviour
 
 
         // Assign shopping and queue references.
-        customer.SetShoppingStops(shoppingStops);
+        customer.SetShoppingStops(GetShoppingStops());
         customer.SetReadingCards(sceneReadingCards);
         customer.SetCheckoutQueue(checkoutQueue);
         customer.SetCheckoutUI(sceneCheckoutUI);
@@ -200,4 +225,42 @@ public class CustomerSpawner : MonoBehaviour
         // The spawned customer is already tracked in activeCustomers.
         // This method is available for future possession tracking and events.
     }
+
+    public void RegisterShoppingStop(Transform stop)
+    {
+        if (stop == null)
+            return;
+
+        if (!registeredShoppingStops.Contains(stop))
+        {
+            registeredShoppingStops.Add(stop);
+
+            Debug.Log(
+                $"CustomerSpawner: Registered shopping stop {stop.name}. " +
+                $"Total stops: {registeredShoppingStops.Count}"
+            );
+        }
+    }
+
+    public void UnregisterShoppingStop(Transform stop)
+    {
+        if (stop == null)
+            return;
+
+        if (registeredShoppingStops.Remove(stop))
+        {
+            Debug.Log(
+                $"CustomerSpawner: Unregistered shopping stop {stop.name}. " +
+                $"Total stops: {registeredShoppingStops.Count}"
+            );
+        }
+    }
+
+    private Transform[] GetShoppingStops()
+    {
+        registeredShoppingStops.RemoveAll(stop => stop == null);
+
+        return registeredShoppingStops.ToArray();
+    }
+
 }
