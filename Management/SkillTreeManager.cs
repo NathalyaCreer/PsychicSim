@@ -16,6 +16,8 @@ public class SkillTreeManager : MonoBehaviour
 
     private const string UnlockedKeyPrefix = "SkillTree_Unlocked_";
 
+    public event System.Action<SkillTreeNode> OnSkillUnlocked;
+
     private void OnEnable()
     {
         // Reapply purchased upgrades from saved skill-node state.
@@ -138,6 +140,7 @@ public class SkillTreeManager : MonoBehaviour
 
         // Apply the gameplay effect immediately.
         ApplyUpgrade(node);
+        OnSkillUnlocked?.Invoke(node);
 
         Debug.Log($"Skill unlocked: {node.DisplayName}");
 
@@ -189,6 +192,10 @@ public class SkillTreeManager : MonoBehaviour
                 break;
 
             case SkillUpgradeType.None:
+
+            case SkillUpgradeType.UnlockEmployeeHiring:
+                Debug.Log("Employee hiring has been unlocked!");
+                break;
             default:
                 break;
         }

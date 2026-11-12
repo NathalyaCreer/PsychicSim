@@ -28,6 +28,10 @@ public class LaptopUI : MonoBehaviour
     [Tooltip("Assign the player's movement and camera-look scripts.")]
     [SerializeField] private Behaviour[] playerControls;
 
+    [Header("Employee Hiring Unlock")]
+    [SerializeField] private SkillTreeManager skillTreeManager;
+    [SerializeField] private SkillTreeNode employeeHiringSkillNode;
+
     private MoneyManager subscribedMoneyManager;
 
     public bool IsOpen { get; private set; }
@@ -69,12 +73,24 @@ public class LaptopUI : MonoBehaviour
                 "LaptopUI: No MoneyManager.Instance found."
             );
         }
+        if(ReputationSystem.Instance == null)
+            return;
+        ReputationSystem.Instance.OnReputationPointsChanged += UpdateReputationPoints;
+        UpdateReputationPoints(ReputationSystem.Instance.ReputationPoints);
+
+        if (skillTreeManager != null)
+        {
+            skillTreeManager.OnSkillUnlocked += HandleSkillUnlocked;
+            RefreshEmployeeHiringAccess();
+        }
     }
 
     private void OnDestroy()
     {
         if (subscribedMoneyManager != null)
             subscribedMoneyManager.OnBalanceChanged -= UpdateMoney;
+        if (skillTreeManager != null)
+            skillTreeManager.OnSkillUnlocked -= HandleSkillUnlocked;
     }
 
     public void OpenLaptop()
@@ -134,6 +150,11 @@ public class LaptopUI : MonoBehaviour
 
     public void ShowEmployeeHiring()
     {
+        if (employeeHiringSkillNode == null ||
+            skillTreeManager == null ||
+            !skillTreeManager.IsUnlocked(employeeHiringSkillNode))
+            return;
+
         SetPanelActive(employeeHiringPanel);
         RefreshMoneyDisplay();
     }
@@ -163,8 +184,7 @@ public class LaptopUI : MonoBehaviour
 
     public void UpdateReputationPoints(int points)
     {
-        if (reputationPointsText != null)
-            reputationPointsText.text = points.ToString();
+        reputationPointsText.text = points.ToString();
     }
 
     private void SetPlayerControls(bool enabled)
@@ -189,6 +209,8 @@ public class LaptopUI : MonoBehaviour
             Cursor.visible = false;
             Cursor.lockState = CursorLockMode.Locked;
         }
+        if(ReputationSystem.Instance != null)
+            ReputationSystem.Instance.OnReputationPointsChanged -= UpdateReputationPoints;
     }
     private void RefreshMoneyDisplay()
     {
@@ -206,4 +228,22 @@ public class LaptopUI : MonoBehaviour
 
         moneyText.text = $"${MoneyManager.Instance.Balance:N0}";
     }
+
+    private void RefreshEmployeeHiringAccess()
+    {
+        bool unlocked =
+            skillTreeManager != null &&
+            employeeHiringSkillNode != null &&
+            skillTreeManager.IsUnlocked(employeeHiringSkillNode);
+
+        if (employeeHiringButton != null)
+            employeeHiringButton.interactable = unlocked;
+    }
+
+    private void HandleSkillUnlocked(SkillTreeNode node)
+    {
+        if (node == employeeHiringSkillNode)
+            RefreshEmployeeHiringAccess();
+    }
+
 }

@@ -37,6 +37,9 @@ public class ReStockShelf : MonoBehaviour
     {
         shelfProducts = new GameObject[shelfFull];
 
+        // Automatically register the player.
+        RegisterPlayer();
+
         // Register products already placed in shelf slots in the Inspector.
         for (int i = 0; i < shelfFull; i++)
         {
@@ -52,6 +55,7 @@ public class ReStockShelf : MonoBehaviour
             if (currentProductType == null && dropped != null)
                 currentProductType = dropped.ProductData;
         }
+
         // Register this shelf as a customer shopping destination.
         if (shoppingStop == null)
             shoppingStop = transform.Find("ShoppingStop");
@@ -69,6 +73,30 @@ public class ReStockShelf : MonoBehaviour
         }
     }
 
+    private void RegisterPlayer()
+    {
+        if (playerPickupDrop != null)
+            return;
+
+        PlayerPickupDrop[] players =
+            FindObjectsByType<PlayerPickupDrop>(FindObjectsSortMode.None);
+
+        foreach (PlayerPickupDrop pickup in players)
+        {
+            if (pickup.CompareTag("Player"))
+            {
+                playerPickupDrop = pickup;
+                Debug.Log($"{name}: Registered player pickup component.", this);
+                return;
+            }
+        }
+
+        Debug.LogWarning(
+            $"{name}: Could not find PlayerPickupDrop. Will retry.",
+            this
+        );
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
@@ -83,6 +111,13 @@ public class ReStockShelf : MonoBehaviour
 
     private void Update()
     {
+        
+        if (playerPickupDrop == null)
+        {
+            RegisterPlayer();
+            return;
+        }
+
         if (!playerInRange || playerPickupDrop == null)
         {
             restockHoldTimer = 0f;

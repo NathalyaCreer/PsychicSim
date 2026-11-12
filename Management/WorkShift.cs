@@ -1,6 +1,7 @@
 
 using System;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class WorkShift : MonoBehaviour
 {
@@ -12,6 +13,12 @@ public class WorkShift : MonoBehaviour
         Afterhours
     }
 
+    public static WorkShift Instance { get; private set; }
+
+    [Header("Scene Names")]
+    [SerializeField] private string storeSceneName = "Store";
+    [SerializeField] private string apartmentSceneName = "Apartment";
+
     [Header("Shift Settings")]
     [SerializeField] private float shiftDurationMinutes = 10f;
 
@@ -20,14 +27,26 @@ public class WorkShift : MonoBehaviour
 
     public float ShiftTimeRemaining { get; private set; }
 
-    // Other scripts can subscribe to this to react to phase changes.
+    public float ShiftProgress01 =>
+        shiftDurationMinutes <= 0f ? 1f :
+        1f - Mathf.Clamp01(
+            ShiftTimeRemaining / (shiftDurationMinutes * 60f)
+        );
+
     public event Action<ShiftPhase> PhaseChanged;
 
     private bool shiftTimerRunning;
 
-    private void Start()
+    private void Awake()
     {
-        SetPhase(ShiftPhase.Dawn);
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
     }
 
     private void Update()
@@ -43,23 +62,17 @@ public class WorkShift : MonoBehaviour
             shiftTimerRunning = false;
 
             if (ReputationSystem.Instance != null)
-            {
                 ReputationSystem.Instance.CompleteShift();
-            }
-            
-            // Store closes automatically when the shift timer ends.
+
             SetPhase(ShiftPhase.Dusk);
         }
     }
 
-    /// <summary>
-    /// Call this when the player flips the store sign to OPEN.
-    /// </summary>
     public void OpenStore()
     {
         if (CurrentPhase != ShiftPhase.Dawn)
         {
-            Debug.LogWarning("The store can only be opened at Dawn.", this);
+            Debug.LogWarning("The store can only be opened at Dawn.");
             return;
         }
 
@@ -69,32 +82,27 @@ public class WorkShift : MonoBehaviour
         SetPhase(ShiftPhase.Daytime);
     }
 
-    /// <summary>
-    /// Call this when the player confirms they are going upstairs.
-    /// </summary>
     public void GoUpstairs()
     {
         if (CurrentPhase != ShiftPhase.Dusk)
         {
-            Debug.LogWarning("The player can only go upstairs after closing.", this);
+            Debug.LogWarning("The player can only go upstairs after closing.");
             return;
         }
 
         SetPhase(ShiftPhase.Afterhours);
+
+        if (SceneTransitionManager.Instance != null)
+            SceneTransitionManager.Instance.LoadApartment(apartmentSceneName);
+        else
+            Debug.LogError("SceneTransitionManager is missing.");
     }
 
-    /// <summary>
-    /// Call this when the player chooses to sleep.
-    /// Starts the next day at Dawn.
-    /// </summary>
     public void SleepAndStartNextDay()
     {
         if (CurrentPhase != ShiftPhase.Afterhours)
         {
-            Debug.LogWarning(
-                "The player can only sleep during Afterhours.",
-                this
-            );
+            Debug.LogWarning("The player can only sleep during Afterhours.");
             return;
         }
 
@@ -106,6 +114,11 @@ public class WorkShift : MonoBehaviour
             ReputationSystem.Instance.BeginNewDay();
 
         SetPhase(ShiftPhase.Dawn);
+
+        if (SceneTransitionManager.Instance != null)
+            SceneTransitionManager.Instance.LoadStore(storeSceneName);
+        else
+            Debug.LogError("SceneTransitionManager is missing.");
     }
 
     private void SetPhase(ShiftPhase newPhase)
@@ -115,7 +128,7 @@ public class WorkShift : MonoBehaviour
 
         CurrentPhase = newPhase;
 
-        Debug.Log($"Day {DayNumber}: phase changed to {CurrentPhase}.", this);
+        Debug.Log($"Day {DayNumber}: phase changed to {CurrentPhase}.");
 
         PhaseChanged?.Invoke(CurrentPhase);
     }
@@ -129,27 +142,3 @@ public class WorkShift : MonoBehaviour
         return $"{minutes:00}:{seconds:00}";
     }
 }
-
-/*
-note: before player starts shift the time is {Dawn}
-1. at Dawn packages are delivered to back door (packages can only be ordered during Afterhours)
-2. backdoor is only accessible during Dawn.
-
-
-each shift is 12 hours (about 10 mins) {Daytime}
-1.Player flips sign to open store (starting shift timer)
-2.Customers spawn within this time in relation to the previous shift's reputation score (ie player had 40/100 reputation by the end of the shift so current shift will have a 2% decrease in customers)
-3. Backdoor is now locked and cannot be entered.
-4.Player is in Store Scene
-
-Closing Shift (after store closes) {Dusk}
-1. Freetime for player to roam and decorate and whatever before heading upstairs.
-2. The upstairs apartment is unlocked using an activated trigger collider that gives the player a confirmation UI in ending the day
-
-Afterhours (once player heads upstairs) {Night}
-1. a new scene loaded into the upstairs apartment
-2. Player can access laptop (supply store, reputation points store)
-3. Player can decorate apartment
-4. Small minigames within apartment (cooking minigame where finished meals appear in breakroom next shift)
-5. Once player sleeps, the next day loads and they are spawned into the store scene {Dawn} 
-*/
