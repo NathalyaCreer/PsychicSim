@@ -64,6 +64,14 @@ public class PossessedCustomer : MonoBehaviour
 
     private bool ragdollActive;
     private Coroutine recoveryCoroutine;
+    private bool isInsideStore;
+
+    public bool IsInsideStore => isInsideStore;
+
+    public void SetInsideStore(bool inside)
+    {
+        isInsideStore = inside;
+    }
 
     private void Start()
     {
@@ -128,8 +136,12 @@ public class PossessedCustomer : MonoBehaviour
 
     public bool BeginPossession(PossessionBehavior behavior)
     {
-        if (CurrentState != PossessionState.Normal || customer == null)
+        if (!isInsideStore ||
+            CurrentState != PossessionState.Normal ||
+            customer == null)
+        {
             return false;
+        }
 
         CurrentBehavior = behavior;
         CurrentState = PossessionState.Possessed;
