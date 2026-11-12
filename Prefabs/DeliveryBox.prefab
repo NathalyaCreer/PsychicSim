@@ -151,7 +151,8 @@ MonoBehaviour:
   boxedProductPrefab: {fileID: 304726870476491062, guid: f49f6cf475f044bda8b3283e28181f96, type: 3}
   productData: {fileID: 0}
   amountInBox: 10
-  productsInBox: []
+  productsInBox:
+  - {fileID: 0}
 --- !u!114 &132379258076999727
 MonoBehaviour:
   m_ObjectHideFlags: 0

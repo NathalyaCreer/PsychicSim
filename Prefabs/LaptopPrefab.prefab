@@ -1970,10 +1970,31 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SkillTreeManager
   nodes:
-  - {fileID: 11400000, guid: 119a9b08174bf46999983ab3335ea822, type: 2}
   - {fileID: 11400000, guid: 9597df37f20fe4f989905001f75740d6, type: 2}
+  - {fileID: 11400000, guid: 8d323a39b8b9b471dbe80429c20eebb3, type: 2}
+  - {fileID: 11400000, guid: 79016e2de8dfa4404bb1413ff7b84b7b, type: 2}
+  - {fileID: 11400000, guid: ccd9c7f2dce824d4fba52593fcc32679, type: 2}
+  - {fileID: 11400000, guid: 5bb793fbb67864b9c8151b7281957c1f, type: 2}
+  - {fileID: 11400000, guid: 92d698718b57d4943836fb84d4fc14e1, type: 2}
+  - {fileID: 11400000, guid: 8b8fce79e3ca545f48641f95f3aa48fe, type: 2}
+  - {fileID: 11400000, guid: 119a9b08174bf46999983ab3335ea822, type: 2}
+  - {fileID: 11400000, guid: 1e124f45882ac400390c4aac3369f644, type: 2}
+  - {fileID: 11400000, guid: ee218f0e31fbb439da59630a847a2882, type: 2}
   - {fileID: 11400000, guid: 7ac4c68e0ad1e49f1a757bbf45a5f3e6, type: 2}
+  - {fileID: 11400000, guid: 02688b3fcc2674bd79aaf12a7e3c44ea, type: 2}
+  - {fileID: 11400000, guid: 77d44ce69fb5043f3aafe17949b336fa, type: 2}
   - {fileID: 11400000, guid: 85ffc27313fe441ef89c71c94f700046, type: 2}
+  - {fileID: 11400000, guid: d056706143e6941f8ac697c409ea7d56, type: 2}
+  - {fileID: 11400000, guid: 292a918caeea74344a3a52006e320dd2, type: 2}
+  - {fileID: 11400000, guid: 87082b570649d4ae79fea823a26f6c67, type: 2}
+  - {fileID: 11400000, guid: 066bc58d36cd846f3bf89eeaf162cdf4, type: 2}
+  - {fileID: 11400000, guid: 80db4c108c3b149dbae6916e1fbf8a59, type: 2}
+  - {fileID: 11400000, guid: a13afe8a9bf4b4f378aaf26e3ab91306, type: 2}
+  - {fileID: 11400000, guid: 8d9379a3cf45b499eac132b3b3c394ad, type: 2}
+  - {fileID: 11400000, guid: b4c1b9e8e4a664b29830128d705db56a, type: 2}
+  - {fileID: 11400000, guid: 4de76ed5dbd58463a83ed505bb6d3831, type: 2}
+  - {fileID: 11400000, guid: ad5b40ada029942b68c140eaeff2f89f, type: 2}
+  - {fileID: 11400000, guid: 115b12112f15d4e50945ab0d8eadde9d, type: 2}
   nodeContainer: {fileID: 6810496883931486571}
   nodeButtonPrefab: {fileID: 8393750058822066755, guid: 61b6d9c5c24c1415abc0bcdd2de7f677, type: 3}
   playerHotbar: {fileID: 0}
@@ -5534,6 +5555,8 @@ MonoBehaviour:
   moneyText: {fileID: 5084443411051404262}
   reputationPointsText: {fileID: 7804298226216798679}
   playerControls: []
+  skillTreeManager: {fileID: 0}
+  employeeHiringSkillNode: {fileID: 11400000, guid: 5bb793fbb67864b9c8151b7281957c1f, type: 2}
 --- !u!1 &7981908000814756123
 GameObject:
   m_ObjectHideFlags: 0
@@ -5707,7 +5730,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &971848502008520049
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5954,7 +5977,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1210439604387512979}
   m_HandleRect: {fileID: 6457451563169231042}
   m_Direction: 2
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
