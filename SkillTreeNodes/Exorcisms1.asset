@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5bc8c47f58dfb4962825fe070e339ff9, type: 3}
   m_Name: Exorcisms1
   m_EditorClassIdentifier: Assembly-CSharp::SkillTreeNode
+  column: 8
+  row: 3
   nodeId: unlockExorcisms
   displayName: Exorcism
   description: Buying tools just aren't cutting it anymore, time to get your hands

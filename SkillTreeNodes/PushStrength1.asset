@@ -12,11 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5bc8c47f58dfb4962825fe070e339ff9, type: 3}
   m_Name: PushStrength1
   m_EditorClassIdentifier: Assembly-CSharp::SkillTreeNode
+  column: 3
+  row: 4
   nodeId: pushStrength1
   displayName: PushStrength
   description: Sometimes you gotta push harder.
   reputationPointCost: 3
   prerequisites:
-  - {fileID: 11400000, guid: 85ffc27313fe441ef89c71c94f700046, type: 2}
+  - {fileID: 11400000, guid: 292a918caeea74344a3a52006e320dd2, type: 2}
   upgradeType: 0
   hotbarSlotNumber: 3

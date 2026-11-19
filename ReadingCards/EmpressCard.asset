@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a5ba7e882bfe6418b94ac49e06f825d2, type: 3}
+  m_Name: EmpressCard
+  m_EditorClassIdentifier: Assembly-CSharp::CardData
+  <Type>k__BackingField: 0
+  <CardName>k__BackingField: The Empress
+  <CardNumber>k__BackingField: 8
+  <Image>k__BackingField: {fileID: 0}
+  <LoveFrame>k__BackingField: {fileID: 0}
+  <WealthFrame>k__BackingField: {fileID: 0}
+  <HealthFrame>k__BackingField: {fileID: 0}
+  loveMeanings:
+  - A Loving Relationship will soonn blossom.
+  - Someone will nuture your heart.
+  - Love will find you when you feel whole.
+  wealthMeanings:
+  - Abundance is growing around you.
+  - Youre investments will bear fruit.
+  - A generous opprotunity is approaching
+  healthMeanings:
+  - Your vitality is undeniable.
+  - Your plate holds a difficult truth.
+  - You're more than your flaws.

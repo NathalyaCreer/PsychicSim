@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30207ff11d8d04daf9a9e02495991a8c, type: 3}
+  m_Name: VoodooDolly
+  m_EditorClassIdentifier: Assembly-CSharp::ProductData
+  productName: VooDooDolly
+  description: Make them understand
+  quality: 45
+  effectiveness: 80
+  purchasePrice: 90
+  sellPrice: 76
+  deliveryType: 0
+  placementPrefab: {fileID: 0}
+  productImage: {fileID: 0}
+  shelfPrefab: {fileID: 7527412469271041048, guid: 745ccc948e25042428c6ea808a3a9daa, type: 3}

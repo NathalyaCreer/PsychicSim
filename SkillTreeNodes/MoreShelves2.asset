@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5bc8c47f58dfb4962825fe070e339ff9, type: 3}
   m_Name: MoreShelves2
   m_EditorClassIdentifier: Assembly-CSharp::SkillTreeNode
+  column: 7
+  row: 2
   nodeId: moreShelves
   displayName: More Shelves
   description: You're growing faster than expected, here's some shelves to keep up.

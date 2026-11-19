@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30207ff11d8d04daf9a9e02495991a8c, type: 3}
+  m_Name: RabbitFoot
+  m_EditorClassIdentifier: Assembly-CSharp::ProductData
+  productName: Rabbits Foot
+  description: No luck coming to ya? Well his neither, but you got a foot.
+  quality: 10
+  effectiveness: 0
+  purchasePrice: 5
+  sellPrice: 7
+  productImage: {fileID: 0}
+  shelfPrefab: {fileID: 0}

@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5bc8c47f58dfb4962825fe070e339ff9, type: 3}
   m_Name: CustomerAttraction1
   m_EditorClassIdentifier: Assembly-CSharp::SkillTreeNode
+  column: 0
+  row: 1
   nodeId: more_Customers
   displayName: Flyer Handout
   description: Door to door brings in more! (customers)

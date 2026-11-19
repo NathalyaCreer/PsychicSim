@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5bc8c47f58dfb4962825fe070e339ff9, type: 3}
   m_Name: FasterRestock3
   m_EditorClassIdentifier: Assembly-CSharp::SkillTreeNode
+  column: 8
+  row: 2
   nodeId: Fast_Restock
   displayName: Quick Hands
   description: Restock shelves faster (x3)

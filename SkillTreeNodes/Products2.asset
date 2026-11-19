@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5bc8c47f58dfb4962825fe070e339ff9, type: 3}
   m_Name: Products2
   m_EditorClassIdentifier: Assembly-CSharp::SkillTreeNode
+  column: 8
+  row: 6
   nodeId: moreProducts
   displayName: Better Inventory
   description: The Lazy Suzan has more products and they look better??!!

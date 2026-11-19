@@ -12,11 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5bc8c47f58dfb4962825fe070e339ff9, type: 3}
   m_Name: FasterRestock2
   m_EditorClassIdentifier: Assembly-CSharp::SkillTreeNode
+  column: 4
+  row: 0
   nodeId: Fast_Restock
   displayName: Quick Hands
   description: Restock shelves faster (x2)
   reputationPointCost: 4
   prerequisites:
-  - {fileID: 11400000, guid: 85ffc27313fe441ef89c71c94f700046, type: 2}
+  - {fileID: 11400000, guid: 87082b570649d4ae79fea823a26f6c67, type: 2}
   upgradeType: 0
   hotbarSlotNumber: 3
