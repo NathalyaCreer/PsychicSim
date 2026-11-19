@@ -9,13 +9,14 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 355962994865617667}
-  - component: {fileID: 388497460924560377}
   - component: {fileID: 7200770745123182474}
-  - component: {fileID: 4653357894710881481}
   - component: {fileID: 6253619717781202068}
   - component: {fileID: 7974775283122063590}
   - component: {fileID: 3948327518171974204}
   - component: {fileID: 7428320575007203144}
+  - component: {fileID: 7516666281995108118}
+  - component: {fileID: 4993247320558913340}
+  - component: {fileID: 9018692409654216074}
   m_Layer: 0
   m_Name: Management
   m_TagString: Untagged
@@ -38,19 +39,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &388497460924560377
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 889431045096211632}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 300126522ed394083a96ccffacd935f1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::WorkShift
-  shiftDurationMinutes: 1
 --- !u!114 &7200770745123182474
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -67,7 +55,7 @@ MonoBehaviour:
   minimumReputation: 0
   maximumReputation: 100
   failureThreshold: 5
-  startingReputationPoints: 0
+  startingReputationPoints: 10
   reputationPerPoint: 50
   successfulReadingReward: 5
   failedReadingPenalty: 5
@@ -82,19 +70,6 @@ MonoBehaviour:
   highReputationBonusCustomers: 2
   lowReputationCustomerReduction: 2
   loadSavedData: 1
---- !u!114 &4653357894710881481
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 889431045096211632}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d15c79f86492c4c0ca1e9ff7b66b71a1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MoneyManager
-  startingMoney: 0
 --- !u!114 &6253619717781202068
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -107,7 +82,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5bc37f8b861444eaba0088c27df26c85, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DeliveryManager
-  workShift: {fileID: 388497460924560377}
+  workShift: {fileID: 0}
   deliveryBoxPrefab: {fileID: 6051278779493492808, guid: f8a7335fbebfa4e479441033a9323ca1, type: 3}
   deliverySpawnPoint: {fileID: 0}
   boxSpacing: 0.8
@@ -126,11 +101,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e1e999c2174c94cf1bf71a4c1095e819, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PossessionManager
-  workShift: {fileID: 388497460924560377}
-  customerSpawner: {fileID: 0}
+  workShift: {fileID: 0}
+  customerSpawner: {fileID: 4993247320558913340}
   reputationSystem: {fileID: 7200770745123182474}
-  possessionChance: 0.3
-  delayBeforeFirstAttempt: 10
+  possessionChance: 0.1
+  delayBeforeFirstAttempt: 40
 --- !u!114 &3948327518171974204
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -169,3 +144,78 @@ MonoBehaviour:
   previewPrefab: {fileID: 0}
   validColor: {r: 0.2, g: 1, b: 0.2, a: 0.45}
   invalidColor: {r: 1, g: 0.15, b: 0.15, a: 0.45}
+--- !u!114 &7516666281995108118
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 889431045096211632}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7495958246a7c4429bf210e683f88c89, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EmployeeSpawner
+  employeePrefab: {fileID: 8831509581248774680, guid: e1fb05f60ad4e41f8aff9322a376481d, type: 3}
+  employeeSpawnPoints:
+  - {fileID: 0}
+  employeeExitPoint: {fileID: 0}
+  checkoutQueue: {fileID: 0}
+  checkoutUI: {fileID: 0}
+  bagSpawn: {fileID: 0}
+  cashierStation: {fileID: 0}
+--- !u!114 &4993247320558913340
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 889431045096211632}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 737a043bbe13348f589bf17b0317201f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CustomerSpawner
+  customerPrefab: {fileID: 8860021416845515073, guid: 55535fbc9d12a483199d7ede81487908, type: 3}
+  spawnPoint: {fileID: 0}
+  spawnInterval: 3
+  maxActiveCustomers: 4
+  customerEntrancePoint: {fileID: 0}
+  workShift: {fileID: 0}
+  checkoutQueue: {fileID: 0}
+  sceneCheckoutUI: {fileID: 0}
+  navMeshSampleDistance: 2
+  shoppingStops: []
+  sceneReadingCards: {fileID: 0}
+  fortuneTellingLine: {fileID: 0}
+  sceneBagSpawn: {fileID: 0}
+  checkoutItemPositions:
+  - {fileID: 0}
+  storeExit: {fileID: 0}
+  reputationSystem: {fileID: 7200770745123182474}
+--- !u!114 &9018692409654216074
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 889431045096211632}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e4c54e2ea3884d77bc14e1cd4faa2dc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MessSpawner
+  trashPrefab: {fileID: 4437451667852071733, guid: ea16732cbb88648078807ce8b85102f1, type: 3}
+  spillPrefab: {fileID: 7500356834758726990, guid: b56c3723e96e642e49263c788811b971, type: 3}
+  maximumMessCount: 20
+  spawnRadius: 1.5
+  floorRayHeight: 2
+  floorRayDistance: 6
+  floorLayer:
+    serializedVersion: 2
+    m_Bits: 512
+  obstructionLayer:
+    serializedVersion: 2
+    m_Bits: 32768
+  trashChance: 0.15
+  spillChance: 0.08
