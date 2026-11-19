@@ -1,3 +1,4 @@
+
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -14,8 +15,6 @@ public class CheckoutUI : MonoBehaviour
     [SerializeField] private TMP_Text readingText;
     [SerializeField] private TMP_Text totalText;
     [SerializeField] private BagSpawn bagSpawn;
-    //[SerializeField] private TMP_Text statusText;
- 
 
     [Header("Buttons")]
     [SerializeField] private Button cardButton;
@@ -28,14 +27,14 @@ public class CheckoutUI : MonoBehaviour
 
     private Customer currentCustomer;
 
-
     private bool? selectedCardPayment;
     private Customer.ReadingType? selectedReading;
     private bool ticketPrinted;
 
-    // Session earnings; this is not yet saved between game sessions.
+    // Session earnings; not yet saved between game sessions.
     private int moneyEarned;
 
+    public int MoneyEarned => moneyEarned;
 
     private void Awake()
     {
@@ -74,34 +73,22 @@ public class CheckoutUI : MonoBehaviour
         Debug.Log("CheckoutUI: Awake completed successfully.", this);
     }
 
+    // --------------------------------------------------
+    // PLAYER CHECKOUT
+    // --------------------------------------------------
 
-    
     public void BeginCheckout(Customer customer)
     {
         Debug.Log("CheckoutUI: BeginCheckout() was called.", this);
 
-        if (customer == null)
+        if (customer == null || customer.IsDead)
         {
-            Debug.LogError("CheckoutUI: Customer reference is NULL!", this);
-            return;
-        }
-
-        Debug.Log($"CheckoutUI: Preparing checkout for {customer.name}.", this);
-
-        if (customer.IsDead)
-        {
-            Debug.LogWarning(
-                $"CheckoutUI: Cannot start checkout. {customer.name} is dead.",
-                this
-            );
+            Debug.LogWarning("CheckoutUI: Invalid customer.", this);
             return;
         }
 
         if (checkoutPanel == null)
-        {
-            Debug.LogError("CheckoutUI: Checkout Panel is NOT assigned!", this);
             return;
-        }
 
         if (currentCustomer != null)
         {
@@ -114,13 +101,9 @@ public class CheckoutUI : MonoBehaviour
         currentCustomer = customer;
 
         if (bagSpawn != null)
-        {
             bagSpawn.SetCheckoutCustomer(customer);
-        }
         else
-        {
             Debug.LogWarning("CheckoutUI: BagSpawn is not assigned.", this);
-        }
 
         selectedCardPayment = null;
         selectedReading = null;
@@ -163,11 +146,10 @@ public class CheckoutUI : MonoBehaviour
         checkoutPanel.SetActive(true);
 
         Debug.Log(
-            $"CheckoutUI: Checkout successfully activated for {customer.name}.",
+            $"CheckoutUI: Checkout activated for {customer.name}.",
             this
         );
     }
-
 
     public void SelectCard()
     {
@@ -175,7 +157,6 @@ public class CheckoutUI : MonoBehaviour
             return;
 
         selectedCardPayment = true;
-
         UpdateTotal();
     }
 
@@ -185,7 +166,6 @@ public class CheckoutUI : MonoBehaviour
             return;
 
         selectedCardPayment = false;
-
         UpdateTotal();
     }
 
@@ -196,21 +176,28 @@ public class CheckoutUI : MonoBehaviour
 
         if (!currentCustomer.WantsReading)
         {
-            readingText.text = "This customer doesn't want a reading.";
+            if (readingText != null)
+                readingText.text = "This customer doesn't want a reading.";
+
             return;
         }
 
         if (!currentCustomer.CanAffordReading)
         {
-            readingText.text = "The customer can't afford the reading fee.";
+            if (readingText != null)
+                readingText.text = "The customer can't afford the reading fee.";
+
             return;
         }
 
         selectedReading = readingType;
         ticketPrinted = false;
 
-
-        readingText.text = $"Selected reading: {readingType} (${currentCustomer.ReadingFee})";
+        if (readingText != null)
+        {
+            readingText.text =
+                $"Selected reading: {readingType} (${currentCustomer.ReadingFee})";
+        }
 
         UpdateTotal();
     }
@@ -219,87 +206,234 @@ public class CheckoutUI : MonoBehaviour
     {
         if (currentCustomer == null || !selectedReading.HasValue)
         {
-            readingText.text = "Select Love, Wealth, or Health first.";
+            if (readingText != null)
+                readingText.text = "Select Love, Wealth, or Health first.";
+
             return;
         }
 
         if (currentCustomer.GiveReadingTicket(selectedReading.Value))
         {
             ticketPrinted = true;
-            readingText.text = $"{selectedReading.Value} ticket given to customer.";
+
+            if (readingText != null)
+            {
+                readingText.text =
+                    $"{selectedReading.Value} ticket given to customer.";
+            }
         }
     }
 
-    
     public void Checkout()
     {
-        
         if (currentCustomer == null || currentCustomer.IsDead)
         {
             if (currentCustomer != null)
                 CancelCheckout(currentCustomer);
 
             return;
-        }  
-        if (currentCustomer == null)
-            return;
+        }
 
-        // Require a payment method.
         if (!selectedCardPayment.HasValue)
         {
-            readingText.text = "Select Cash or Card first.";
+            if (readingText != null)
+                readingText.text = "Select Cash or Card first.";
+
             return;
         }
 
-        // Require the reading ticket if a reading was selected.
         bool includeReading = selectedReading.HasValue;
 
         if (includeReading && !ticketPrinted)
         {
-            readingText.text = "Print the reading ticket before checkout.";
+            if (readingText != null)
+                readingText.text = "Print the reading ticket before checkout.";
+
             return;
         }
 
         Customer customerBeingCheckedOut = currentCustomer;
 
-        // Copy products before TryCompleteCheckout clears purchase data.
         List<ProductData> productsBeingSold =
             new List<ProductData>(customerBeingCheckedOut.PurchasedProducts);
 
-        bool paymentSucceeded = customerBeingCheckedOut.TryCompleteCheckout(selectedCardPayment.Value,includeReading,selectedReading.GetValueOrDefault(),out int total, out string message);
-        
-        Debug.Log($"Checkout result: success={paymentSucceeded}, total=${total}, message={message}",this);
+        bool paymentSucceeded = customerBeingCheckedOut.TryCompleteCheckout(
+            selectedCardPayment.Value,
+            includeReading,
+            selectedReading.GetValueOrDefault(),
+            out int total,
+            out string message
+        );
+
+        Debug.Log(
+            $"Checkout result: success={paymentSucceeded}, total=${total}, message={message}",
+            this
+        );
 
         if (!paymentSucceeded)
         {
-            readingText.text = message;
+            if (readingText != null)
+                readingText.text = message;
+
             return;
         }
 
-        // Payment succeeded.
-        moneyEarned += total;
-        Debug.Log($"Reached wallet deposit. Sale total: ${total}", this);
-        Debug.Log($"MoneyManager.Instance exists: {MoneyManager.Instance != null}", this);
+        CompleteSale(customerBeingCheckedOut, productsBeingSold, total);
 
-        // Deposit this completed sale into the player's persistent wallet.
-        if (MoneyManager.Instance != null)
+        if (totalText != null)
+            totalText.text = $"Sale complete: ${total}";
+
+        if (readingText != null)
         {
-            Debug.Log($"Wallet before sale: ${MoneyManager.Instance.Balance}", this);            
-            MoneyManager.Instance.AddMoney(total);            
+            readingText.text = customerBeingCheckedOut.Unsatisfied
+                ? "Wrong reading ticket! Customer is unhappy."
+                : message;
+        }
 
-            Debug.Log($"Wallet after sale: ${MoneyManager.Instance.Balance}", this);
+        checkoutPanel.SetActive(false);
+        currentCustomer = null;
+    }
+
+    // --------------------------------------------------
+    // AUTOMATED CASHIER CHECKOUT
+    // --------------------------------------------------
+
+    public bool ProcessCashierCheckout(Customer customer)
+    {
+        if (customer == null || customer.IsDead)
+            return false;
+
+        if (customer.HasPaid)
+            return true;
+
+        if (bagSpawn == null)
+        {
+            Debug.LogError(
+                "Cashier checkout failed: BagSpawn is not assigned.",
+                this
+            );
+
+            return false;
+        }
+
+        Debug.Log(
+            $"Cashier is processing checkout for {customer.name}.",
+            this
+        );
+
+        // Assign the customer and spawn their checkout bag.
+        if (!bagSpawn.SpawnBagForCashier(customer))
+        {
+            Debug.LogWarning(
+                $"Cashier could not spawn a bag for {customer.name}.",
+                this
+            );
+
+            return false;
+        }
+
+        // Automatically put every purchased product into the bag.
+        if (!customer.BagAllCheckoutItems())
+        {
+            Debug.LogWarning(
+                $"Cashier could not bag all products for {customer.name}.",
+                this
+            );
+
+            return false;
+        }
+
+        // Cashiers automatically issue the customer's requested
+        // reading ticket using the correct reading type.
+        bool includeReading =
+            customer.WantsReading && customer.CanAffordReading;
+
+        if (includeReading)
+        {
+            if (!customer.GiveReadingTicket(customer.PurchaseReading))
+            {
+                Debug.LogWarning(
+                    $"Cashier could not issue a reading ticket to {customer.name}.",
+                    this
+                );
+
+                return false;
+            }
+        }
+
+        // Select the customer's actual payment method.
+        bool payingByCard = customer.PaysByCard;
+
+        List<ProductData> productsBeingSold =
+            new List<ProductData>(customer.PurchasedProducts);
+
+        bool paymentSucceeded = customer.TryCompleteCheckout(
+            payingByCard,
+            includeReading,
+            customer.PurchaseReading,
+            out int total,
+            out string message
+        );
+
+        Debug.Log(
+            $"Cashier checkout: Customer={customer.name}, " +
+            $"Payment={(payingByCard ? "Card" : "Cash")}, " +
+            $"Success={paymentSucceeded}, Total=${total}, Message={message}",
+            this
+        );
+
+        if (!paymentSucceeded)
+            return false;
+
+        CompleteSale(customer, productsBeingSold, total);
+
+        Debug.Log(
+            $"Cashier successfully completed checkout for {customer.name}.",
+            this
+        );
+
+        return true;
+    }
+
+    // --------------------------------------------------
+    // SHARED SALE PROCESSING
+    // --------------------------------------------------
+
+    private void CompleteSale(
+        Customer customer,
+        List<ProductData> productsBeingSold,
+        int total)
+    {
+        if (customer == null)
+            return;
+
+        // Add earnings once for this completed transaction.
+        moneyEarned += total;
+
+        MoneyManager manager =
+            moneyManager != null ? moneyManager : MoneyManager.Instance;
+
+        if (manager != null)
+        {
+            manager.AddMoney(total);
+
+            Debug.Log(
+                $"Sale deposited: ${total}. Wallet balance: ${manager.Balance}",
+                this
+            );
         }
         else
         {
-            Debug.LogError("CheckoutUI: MoneyManager.Instance is NULL.", this);
-
+            Debug.LogError(
+                "CheckoutUI: MoneyManager.Instance is NULL.",
+                this
+            );
         }
 
-        totalText.text = $"Sale complete: ${total}";
-        readingText.text = message;
-
-        // Apply reputation change only once per transaction.
-        if (ReputationSystem.Instance != null && productsBeingSold.Count > 0)
+        // Apply product reputation once per transaction.
+        if (ReputationSystem.Instance != null &&
+            productsBeingSold != null &&
+            productsBeingSold.Count > 0)
         {
             int totalQuality = 0;
             int validProductCount = 0;
@@ -315,31 +449,37 @@ public class CheckoutUI : MonoBehaviour
 
             if (validProductCount > 0)
             {
-                float averageQuality = (float)totalQuality / validProductCount;
+                float averageQuality =
+                    (float)totalQuality / validProductCount;
+
                 bool highQuality = averageQuality >= 70f;
 
                 ReputationSystem.Instance.ReportProductQuality(highQuality);
 
                 Debug.Log(
-                    $"Checkout complete. Average product quality: {averageQuality:F1}. " +
-                    $"Reputation {(highQuality ? "increased" : "decreased")} once."
+                    $"Checkout complete. Average product quality: " +
+                    $"{averageQuality:F1}. Reputation " +
+                    $"{(highQuality ? "increased" : "decreased")} once.",
+                    this
                 );
             }
         }
 
-        // Handle an incorrect reading ticket.
-        if (customerBeingCheckedOut.Unsatisfied)
+        if (customer.Unsatisfied)
         {
-            readingText.text = "Wrong reading ticket! Customer is unhappy.";
+            Debug.LogWarning(
+                $"{customer.name} was unhappy with their reading ticket.",
+                this
+            );
         }
-
-        checkoutPanel.SetActive(false);
-        currentCustomer = null;
     }
+
+    // --------------------------------------------------
+    // CANCEL CHECKOUT
+    // --------------------------------------------------
 
     public void CancelCheckout(Customer customer)
     {
-        // Never cancel another customer's checkout by mistake.
         if (customer == null || currentCustomer != customer)
             return;
 
@@ -348,35 +488,49 @@ public class CheckoutUI : MonoBehaviour
             this
         );
 
-        // Release the checkout UI.
-        checkoutPanel.SetActive(false);
+        if (checkoutPanel != null)
+            checkoutPanel.SetActive(false);
+
         currentCustomer = null;
 
-        // Reset selections so the next customer starts fresh.
         selectedCardPayment = null;
         selectedReading = null;
         ticketPrinted = false;
 
-        // Clear the active customer assigned to the bag spawner.
         if (bagSpawn != null)
             bagSpawn.SetCheckoutCustomer(null);
 
-        // Clear old customer information from the UI.
-        itemsText.text = "";
-        readingText.text = "";
-        totalText.text = "";
+        if (itemsText != null)
+            itemsText.text = "";
 
-        // Reset button states.
-        loveButton.interactable = false;
-        wealthButton.interactable = false;
-        healthButton.interactable = false;
-        printTicketButton.interactable = false;
+        if (readingText != null)
+            readingText.text = "";
+
+        if (totalText != null)
+            totalText.text = "";
+
+        if (loveButton != null)
+            loveButton.interactable = false;
+
+        if (wealthButton != null)
+            wealthButton.interactable = false;
+
+        if (healthButton != null)
+            healthButton.interactable = false;
+
+        if (printTicketButton != null)
+            printTicketButton.interactable = false;
 
         Debug.Log("Checkout released for the next customer.", this);
     }
+
+    // --------------------------------------------------
+    // UI TOTAL
+    // --------------------------------------------------
+
     private void UpdateTotal()
     {
-        if (currentCustomer == null)
+        if (currentCustomer == null || totalText == null)
             return;
 
         int total = currentCustomer.ShoppingTotal;

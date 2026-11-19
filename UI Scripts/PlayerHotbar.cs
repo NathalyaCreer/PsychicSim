@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -26,30 +27,62 @@ public class PlayerHotbar : MonoBehaviour
     public int SelectedSlot => selectedSlot;
     public int UnlockedSlotCount => unlockedSlotCount;
     public int TotalSlotCount => slots != null ? slots.Length : slotCount;
+    public static PlayerHotbar Instance { get; private set; }
+
+    public static event Action<PlayerHotbar> OnHotbarRegistered;
 
     public ObjectGrabbable HeldObject =>
         slots != null && selectedSlot >= 0 && selectedSlot < slots.Length
             ? slots[selectedSlot]
             : null;
 
+
     private void Awake()
     {
+        if (Instance != null && Instance != this)
+        {
+            Debug.LogWarning("Multiple PlayerHotbars detected. Destroying duplicate.", this);
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+
         slotCount = Mathf.Max(2, slotCount);
         startingUnlockedSlots = Mathf.Clamp(startingUnlockedSlots, 2, slotCount);
 
         slots = new ObjectGrabbable[slotCount];
 
-        // New save starts with two slots; existing save loads its unlocked count.
+        // Load saved unlocked slots.
         unlockedSlotCount = PlayerPrefs.GetInt(
             UnlockedSlotsKey,
             startingUnlockedSlots
         );
 
-        unlockedSlotCount = Mathf.Clamp(unlockedSlotCount, startingUnlockedSlots, slotCount);
+        unlockedSlotCount = Mathf.Clamp(
+            unlockedSlotCount,
+            startingUnlockedSlots,
+            slotCount
+        );
+
         selectedSlot = 0;
 
         RefreshUI();
+
+        // Register only after initialization is complete.
+        OnHotbarRegistered?.Invoke(this);
+
+        Debug.Log("PlayerHotbar registered successfully.", this);
     }
+
+    private void OnDestroy()
+    {
+        if (Instance == this)
+        {
+            Instance = null;
+        }
+    }
+
 
     private void Update()
     {
