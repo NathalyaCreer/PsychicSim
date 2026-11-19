@@ -125,4 +125,5 @@ public class FurnitureFireTarget : MonoBehaviour
 
         Debug.Log($"{name} has been restored after repair.", this);
     }
+
 }

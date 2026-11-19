@@ -13,6 +13,7 @@ public class CustomerSpawner : MonoBehaviour
     [SerializeField] private Transform spawnPoint;
     [SerializeField] private float spawnInterval = 8f;
     [SerializeField] private int maxActiveCustomers = 5;
+    [SerializeField] private Transform customerEntrancePoint;
 
     [Header("Work Shift")]
     [SerializeField] private WorkShift workShift;
@@ -23,9 +24,6 @@ public class CustomerSpawner : MonoBehaviour
 
     [Header("NavMesh")]
     [SerializeField] private float navMeshSampleDistance = 2f;
-
-    [Header("Shopping")]
-    [SerializeField] private Transform[] shoppingStops;
 
     [Header("Customer Systems")]
     [SerializeField] private ReadingCards sceneReadingCards;
@@ -39,9 +37,24 @@ public class CustomerSpawner : MonoBehaviour
     [Header("Reputation")]
     [SerializeField] private ReputationSystem reputationSystem;
 
+    private readonly List<ReStockShelf> registeredShelves =
+        new List<ReStockShelf>();
 
-    private readonly List<Transform> registeredShoppingStops = new List<Transform>();
-    private readonly List<Customer> activeCustomers = new List<Customer>();
+    private readonly List<Customer> activeCustomers =
+        new List<Customer>();
+
+    private Coroutine spawnRoutine;
+
+    public bool HasCustomersRemaining => ActiveCustomerCount > 0;
+
+    public int ActiveCustomerCount
+    {
+        get
+        {
+            activeCustomers.RemoveAll(customer => customer == null);
+            return activeCustomers.Count;
+        }
+    }
 
     private void Awake()
     {
@@ -52,41 +65,42 @@ public class CustomerSpawner : MonoBehaviour
         }
 
         Instance = this;
+        registeredShelves.Clear();
+    }
 
-        registeredShoppingStops.Clear();
+    private void OnEnable()
+    {
+        if (spawnRoutine == null)
+            spawnRoutine = StartCoroutine(SpawnCustomersRoutine());
+    }
 
-        if (shoppingStops == null)
-            return;
-
-        foreach (Transform stop in shoppingStops)
+    private void OnDisable()
+    {
+        if (spawnRoutine != null)
         {
-            if (stop != null && !registeredShoppingStops.Contains(stop))
-                registeredShoppingStops.Add(stop);
+            StopCoroutine(spawnRoutine);
+            spawnRoutine = null;
         }
     }
 
-    private void Start()
+    private void OnDestroy()
     {
-        if (workShift == null)
-        {
-            Debug.LogError(
-                "CustomerSpawner: Assign the WorkShift reference.",
-                this
-            );
-            return;
-        }
-
-        StartCoroutine(SpawnCustomersRoutine());
+        if (Instance == this)
+            Instance = null;
     }
 
     private IEnumerator SpawnCustomersRoutine()
     {
+        while (workShift == null)
+        {
+            workShift = WorkShift.Instance;
+            yield return null;
+        }
+
         while (true)
         {
-            // Remove customers that have been destroyed.
             activeCustomers.RemoveAll(customer => customer == null);
 
-            // Only spawn new customers while the store is open.
             if (workShift.CurrentPhase == WorkShift.ShiftPhase.Daytime)
             {
                 int currentMaxCustomers = reputationSystem != null
@@ -97,7 +111,6 @@ public class CustomerSpawner : MonoBehaviour
                     SpawnCustomer();
             }
 
-            // Recheck the phase and customer count after each interval.
             yield return new WaitForSeconds(GetCurrentSpawnInterval());
         }
     }
@@ -108,7 +121,6 @@ public class CustomerSpawner : MonoBehaviour
             ? reputationSystem.GetSpawnInterval(spawnInterval)
             : spawnInterval;
 
-        // Prevent zero or negative wait intervals.
         return Mathf.Max(0.1f, interval);
     }
 
@@ -123,7 +135,6 @@ public class CustomerSpawner : MonoBehaviour
             return;
         }
 
-        // Find a nearby valid NavMesh position.
         if (!NavMesh.SamplePosition(
                 spawnPoint.position,
                 out NavMeshHit hit,
@@ -137,32 +148,46 @@ public class CustomerSpawner : MonoBehaviour
             return;
         }
 
-        // Spawn the customer.
         Customer customer = Instantiate(
             customerPrefab,
             hit.position,
             spawnPoint.rotation
         );
 
+        if (customer == null)
+        {
+            Debug.LogWarning(
+                "CustomerSpawner: Spawned customer is missing its Customer component."
+            );
+            return;
+        }
 
-        // Assign shopping and queue references.
-        customer.SetShoppingStops(GetShoppingStops());
+        customer.SetEntrancePoint(customerEntrancePoint);
+
+        // Randomize customer appearance.
+        CustomerAppearanceRandomizer appearance =
+            customer.GetComponent<CustomerAppearanceRandomizer>();
+
+        if (appearance != null)
+            appearance.RandomizeAppearance();
+
+        // Assign available shopping shelves.
+        customer.SetShoppingShelves(GetShoppingShelves());
+
+        // Assign queue and checkout references.
         customer.SetReadingCards(sceneReadingCards);
         customer.SetCheckoutQueue(checkoutQueue);
         customer.SetCheckoutUI(sceneCheckoutUI);
         customer.SetReputationSystem(reputationSystem);
         customer.SetExitPoint(storeExit);
 
-        // Assign checkout bag spawner and counter positions.
         customer.InitializeCheckout(
             checkoutItemPositions,
             sceneBagSpawn
         );
 
-        // Assign additional customer systems.
         customer.SetFortuneTellingLine(fortuneTellingLine);
 
-        // Track this customer.
         activeCustomers.Add(customer);
 
         Debug.Log(
@@ -196,8 +221,7 @@ public class CustomerSpawner : MonoBehaviour
     {
         activeCustomers.RemoveAll(customer => customer == null);
 
-        System.Collections.Generic.List<Customer> eligible =
-            new System.Collections.Generic.List<Customer>();
+        List<Customer> eligible = new List<Customer>();
 
         foreach (Customer customer in activeCustomers)
         {
@@ -223,44 +247,41 @@ public class CustomerSpawner : MonoBehaviour
     public void RegisterPossessedCustomer(PossessedCustomer customer)
     {
         // The spawned customer is already tracked in activeCustomers.
-        // This method is available for future possession tracking and events.
     }
 
-    public void RegisterShoppingStop(Transform stop)
+    public void RegisterShelf(ReStockShelf shelf)
     {
-        if (stop == null)
+        if (shelf == null)
             return;
 
-        if (!registeredShoppingStops.Contains(stop))
+        if (!registeredShelves.Contains(shelf))
         {
-            registeredShoppingStops.Add(stop);
+            registeredShelves.Add(shelf);
 
             Debug.Log(
-                $"CustomerSpawner: Registered shopping stop {stop.name}. " +
-                $"Total stops: {registeredShoppingStops.Count}"
+                $"CustomerSpawner: Registered shelf {shelf.name}. " +
+                $"Total shelves: {registeredShelves.Count}"
             );
         }
     }
 
-    public void UnregisterShoppingStop(Transform stop)
+    public void UnregisterShelf(ReStockShelf shelf)
     {
-        if (stop == null)
+        if (shelf == null)
             return;
 
-        if (registeredShoppingStops.Remove(stop))
+        if (registeredShelves.Remove(shelf))
         {
             Debug.Log(
-                $"CustomerSpawner: Unregistered shopping stop {stop.name}. " +
-                $"Total stops: {registeredShoppingStops.Count}"
+                $"CustomerSpawner: Unregistered shelf {shelf.name}. " +
+                $"Total shelves: {registeredShelves.Count}"
             );
         }
     }
 
-    private Transform[] GetShoppingStops()
+    private ReStockShelf[] GetShoppingShelves()
     {
-        registeredShoppingStops.RemoveAll(stop => stop == null);
-
-        return registeredShoppingStops.ToArray();
+        registeredShelves.RemoveAll(shelf => shelf == null);
+        return registeredShelves.ToArray();
     }
-
 }

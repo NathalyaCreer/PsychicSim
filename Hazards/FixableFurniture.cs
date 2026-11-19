@@ -126,4 +126,17 @@ public class FixableFurniture : MonoBehaviour
 
         OnRepaired?.Invoke();
     }
+
+    // Called by maintenance employees. Employee repairs do not charge the player's money.
+    public bool RepairByEmployee()
+    {
+        if (!NeedsRepair)
+            return false;
+
+        RestoreFurniture();
+
+        Debug.Log($"{name} was repaired by a maintenance employee.", this);
+
+        return true;
+    }
 }

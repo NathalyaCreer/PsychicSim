@@ -1,3 +1,4 @@
+using UnityEngine.UI;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,6 +8,13 @@ public class SkillTreeManager : MonoBehaviour
     [SerializeField] private List<SkillTreeNode> nodes = new List<SkillTreeNode>();
     [SerializeField] private Transform nodeContainer;
     [SerializeField] private SkillTreeNodeButton nodeButtonPrefab;
+
+    [Header("Tree Layout")]
+    [SerializeField] private Vector2 nodeSpacing = new Vector2(320f, 220f);
+    [SerializeField] private Vector2 treePadding = new Vector2(150f, 120f);
+    [SerializeField] private Image connectorPrefab;
+    [SerializeField] private Color connectorColor = new Color(0.45f, 0.45f, 0.5f, 0.8f);
+    [SerializeField] private float connectorThickness = 5f;
 
     [Header("Gameplay Upgrade Targets")]
     [SerializeField] private PlayerHotbar playerHotbar;
@@ -18,10 +26,16 @@ public class SkillTreeManager : MonoBehaviour
 
     public event System.Action<SkillTreeNode> OnSkillUnlocked;
 
+
     private void OnEnable()
     {
-        // Reapply purchased upgrades from saved skill-node state.
-        ApplyAllUnlockedUpgrades();
+        PlayerHotbar.OnHotbarRegistered += RegisterPlayerHotbar;
+
+        // The player may already exist when this manager becomes active.
+        if (PlayerHotbar.Instance != null)
+        {
+            RegisterPlayerHotbar(PlayerHotbar.Instance);
+        }
 
         BuildTree();
 
@@ -29,8 +43,10 @@ public class SkillTreeManager : MonoBehaviour
             ReputationSystem.Instance.OnReputationPointsChanged += HandlePointsChanged;
     }
 
+
     private void OnDisable()
     {
+        PlayerHotbar.OnHotbarRegistered -= RegisterPlayerHotbar;
         if (ReputationSystem.Instance != null)
             ReputationSystem.Instance.OnReputationPointsChanged -= HandlePointsChanged;
     }
@@ -46,11 +62,77 @@ public class SkillTreeManager : MonoBehaviour
             return;
         }
 
+        RectTransform contentRect = nodeContainer as RectTransform;
+
+        if (contentRect == null)
+        {
+            Debug.LogError("Node Container must have a RectTransform.", this);
+            return;
+        }
+
+        // Remove previously generated nodes and connectors.
         for (int i = nodeContainer.childCount - 1; i >= 0; i--)
             Destroy(nodeContainer.GetChild(i).gameObject);
 
         spawnedButtons.Clear();
 
+        Dictionary<SkillTreeNode, Vector2> nodePositions =
+            new Dictionary<SkillTreeNode, Vector2>();
+
+        int maxColumn = 0;
+        int maxRow = 0;
+
+        foreach (SkillTreeNode node in nodes)
+        {
+            if (node == null)
+                continue;
+
+            maxColumn = Mathf.Max(maxColumn, node.Column);
+            maxRow = Mathf.Max(maxRow, node.Row);
+
+            Vector2 position = new Vector2(
+                treePadding.x + node.Column * nodeSpacing.x,
+                -(treePadding.y + node.Row * nodeSpacing.y)
+            );
+
+            nodePositions[node] = position;
+        }
+
+        // Set the Scroll View content size.
+        float contentWidth =
+            treePadding.x * 2f + maxColumn * nodeSpacing.x + nodeSpacing.x;
+
+        float contentHeight =
+            treePadding.y * 2f + maxRow * nodeSpacing.y + nodeSpacing.y;
+
+        contentRect.sizeDelta = new Vector2(
+            contentWidth,
+            contentHeight
+        );
+
+        // Draw prerequisite connectors first so they appear behind nodes.
+        if (connectorPrefab != null)
+        {
+            foreach (SkillTreeNode node in nodes)
+            {
+                if (node == null || node.Prerequisites == null)
+                    continue;
+
+                foreach (SkillTreeNode prerequisite in node.Prerequisites)
+                {
+                    if (prerequisite == null ||
+                        !nodePositions.ContainsKey(prerequisite))
+                        continue;
+
+                    CreateConnector(
+                        nodePositions[prerequisite],
+                        nodePositions[node]
+                    );
+                }
+            }
+        }
+
+        // Spawn skill buttons at their assigned positions.
         foreach (SkillTreeNode node in nodes)
         {
             if (node == null)
@@ -58,6 +140,14 @@ public class SkillTreeManager : MonoBehaviour
 
             SkillTreeNodeButton nodeButton =
                 Instantiate(nodeButtonPrefab, nodeContainer);
+
+            RectTransform buttonRect =
+                nodeButton.GetComponent<RectTransform>();
+
+            buttonRect.anchorMin = new Vector2(0f, 1f);
+            buttonRect.anchorMax = new Vector2(0f, 1f);
+            buttonRect.pivot = new Vector2(0.5f, 0.5f);
+            buttonRect.anchoredPosition = nodePositions[node];
 
             nodeButton.Setup(node, this);
             spawnedButtons.Add(nodeButton);
@@ -148,8 +238,12 @@ public class SkillTreeManager : MonoBehaviour
         return true;
     }
     
+
     private void ApplyAllUnlockedUpgrades()
     {
+        if (playerHotbar == null)
+            return;
+
         // Restore hotbar upgrades in slot order.
         for (int slotNumber = 3; slotNumber <= 5; slotNumber++)
         {
@@ -167,8 +261,9 @@ public class SkillTreeManager : MonoBehaviour
             }
         }
 
-        // Apply any other unlocked upgrade types here as you add them.
+        // Apply other unlocked upgrade types here as needed.
     }
+
 
     private void ApplyUpgrade(SkillTreeNode node)
     {
@@ -214,4 +309,47 @@ public class SkillTreeManager : MonoBehaviour
                 nodeButton.Refresh();
         }
     }
+
+    private void CreateConnector(Vector2 start, Vector2 end)
+    {
+        Image connector = Instantiate(connectorPrefab, nodeContainer);
+
+        RectTransform rect = connector.rectTransform;
+
+        rect.anchorMin = new Vector2(0f, 1f);
+        rect.anchorMax = new Vector2(0f, 1f);
+        rect.pivot = new Vector2(0.5f, 0.5f);
+
+        Vector2 difference = end - start;
+
+        rect.anchoredPosition = (start + end) * 0.5f;
+        rect.sizeDelta = new Vector2(
+            difference.magnitude,
+            connectorThickness
+        );
+
+        float angle = Mathf.Atan2(
+            difference.y,
+            difference.x
+        ) * Mathf.Rad2Deg;
+
+        rect.localRotation = Quaternion.Euler(0f, 0f, angle);
+
+        connector.color = connectorColor;
+    }
+
+
+    private void RegisterPlayerHotbar(PlayerHotbar hotbar)
+    {
+        if (hotbar == null)
+            return;
+
+        playerHotbar = hotbar;
+
+        Debug.Log("SkillTreeManager registered PlayerHotbar.", this);
+
+        // Restore purchased hotbar upgrades on the newly spawned player.
+        ApplyAllUnlockedUpgrades();
+    }
+
 }

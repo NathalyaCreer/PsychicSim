@@ -1,3 +1,4 @@
+
 using UnityEngine;
 
 public class ApartmentEntryTrigger : MonoBehaviour
@@ -12,6 +13,9 @@ public class ApartmentEntryTrigger : MonoBehaviour
     {
         if (confirmationPanel != null)
             confirmationPanel.SetActive(false);
+
+        if (workShift == null)
+            workShift = WorkShift.Instance;
     }
 
     private void OnTriggerEnter(Collider other)
@@ -43,31 +47,52 @@ public class ApartmentEntryTrigger : MonoBehaviour
             confirmationPanel.SetActive(false);
     }
 
-    private void UpdatePrompt()
+    private bool CanGoUpstairs()
     {
-        if (confirmationPanel == null || workShift == null)
-            return;
+        WorkShift shift = WorkShift.Instance;
 
-        // Only offer apartment entry after the store closes.
-        bool canGoUpstairs =
-            workShift.CurrentPhase == WorkShift.ShiftPhase.Dusk;
+        if (shift == null)
+            shift = workShift;
 
-        confirmationPanel.SetActive(playerInside && canGoUpstairs);
+        CustomerSpawner spawner = CustomerSpawner.Instance;
+
+        return shift != null &&
+               shift.CurrentPhase == WorkShift.ShiftPhase.Dusk &&
+               spawner != null &&
+               !spawner.HasCustomersRemaining;
     }
 
-    // Hook this to the confirmation button's OnClick.
-    public void ConfirmGoUpstairs()
+    private void UpdatePrompt()
     {
-        if (!playerInside || workShift == null)
+        if (confirmationPanel == null)
             return;
 
-        workShift.GoUpstairs();
+        confirmationPanel.SetActive(
+            playerInside && CanGoUpstairs()
+        );
+    }
+
+    public void ConfirmGoUpstairs()
+    {
+        if (!playerInside)
+            return;
+
+        if (!CanGoUpstairs())
+        {
+            Debug.LogWarning(
+                "You cannot go upstairs until all customers have left the store."
+            );
+
+            UpdatePrompt();
+            return;
+        }
+
+        WorkShift.Instance.GoUpstairs();
 
         if (confirmationPanel != null)
             confirmationPanel.SetActive(false);
     }
 
-    // Hook this to the cancel button's OnClick.
     public void CancelGoUpstairs()
     {
         if (confirmationPanel != null)

@@ -154,5 +154,23 @@ public class BagSpawn : MonoBehaviour
 
         checkoutCustomer = null;
     }
+
+    public bool SpawnBagForCashier(Customer customer)
+    {
+        if (customer == null)
+            return false;
+
+        if (ActiveBag != null)
+        {
+            Debug.LogWarning("A checkout bag already exists.");
+            return false;
+        }
+
+        checkoutCustomer = customer;
+
+        SpawnBag();
+
+        return ActiveBag != null;
+    }
 }
 

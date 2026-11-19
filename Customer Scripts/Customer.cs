@@ -40,8 +40,9 @@ public class Customer : MonoBehaviour
     [SerializeField] private Transform checkoutPoint;
     [SerializeField] private Transform readingTablePoint;
     [SerializeField] private Transform exitPoint;
-    [SerializeField] private Transform[] shoppingStops;
+    [SerializeField] private ReStockShelf[] shoppingShelves;
     [SerializeField] private Animator animator;
+    [SerializeField] private Transform entrancePoint;
 
     [Header("Customer Behavior")]
     [SerializeField] private int minShoppingStops = 1;
@@ -84,6 +85,24 @@ public class Customer : MonoBehaviour
     [Header("Fire Evacuation")]
     [SerializeField, Min(0f)] private float fireDetectionDistance = 8f;
     [SerializeField, Min(0.1f)] private float fireCheckInterval = .35f;
+
+    [Header("Customer Mess Generation")]
+    [SerializeField] private float minimumMessInterval = 8f;
+    [SerializeField] private float maximumMessInterval = 16f;
+
+    [Header("Shopping Animations")]
+    [SerializeField] private string grabLowTrigger = "GrabLow";
+    [SerializeField] private string grabHighTrigger = "GrabHigh";
+
+    [SerializeField] private float browseDuration = 1.5f;
+    [SerializeField] private float grabDuration = 0.8f;
+
+    [Header("Shelf Navigation")]
+    [SerializeField] private float shelfNavMeshSampleDistance = 1f;
+    [SerializeField] private int shelfApproachSamples = 16;
+    [SerializeField] private float shelfEntryWaitTime = 1.5f;
+
+    private float messTimer;
     #endregion
 
     #region Public Properties
@@ -134,6 +153,9 @@ public class Customer : MonoBehaviour
     private bool isEvacuating;
     public bool IsEvacuating => isEvacuating;
 
+    private bool isInsideShoppingZone;
+    public bool IsInsideShoppingZone => isInsideShoppingZone;
+
     #endregion
 
     private void Awake()
@@ -150,6 +172,15 @@ public class Customer : MonoBehaviour
                 $"{name}: Customer has no NavMeshAgent reference.",
                 this
             );
+        }
+        if (agent != null)
+        {
+            agent.updateRotation = true;
+        }
+
+        if (animator != null)
+        {
+            animator.applyRootMotion = false;
         }
     }
 
@@ -170,10 +201,14 @@ public class Customer : MonoBehaviour
             }
         }
         
+        UpdateMessGeneration();
+        
         if (animator == null || agent == null)
             return;
 
-        float speed = agent.velocity.magnitude;
+        float speed = agent.isStopped
+            ? 0f
+            : agent.velocity.magnitude;
 
         animator.SetFloat("Speed", speed, 0.1f, Time.deltaTime);
     }
@@ -210,48 +245,150 @@ public class Customer : MonoBehaviour
         }
 
         customerRoutine = StartCoroutine(CustomerRoutine());
+        messTimer = Random.Range(minimumMessInterval,maximumMessInterval);
     }
 
     private IEnumerator CustomerRoutine()
     {
         CurrentState = CustomerState.Entering;
 
-        // Shop at randomly selected shelf stops.
+        // Navigate to the store entrance first.
+        if (entrancePoint != null)
+        {
+            yield return MoveTo(entrancePoint.position);
+
+            if (!moveToSucceeded)
+            {
+                Debug.LogWarning($"{name}: Could not reach the store entrance.");
+                yield break;
+            }
+        }
+
+        // Wait until the customer physically enters the ShoppingZone.
+        yield return new WaitUntil(() =>
+            IsInsideShoppingZone || IsDead || isEvacuating
+        );
+
+        if (IsDead || isEvacuating)
+            yield break;
+
+        // Customer is now allowed to shop.
         CurrentState = CustomerState.Shopping;
 
-        if (shoppingStops != null && shoppingStops.Length > 0)
+        if (shoppingShelves != null && shoppingShelves.Length > 0)
         {
             int stopCount = Random.Range(
                 minShoppingStops,
                 maxShoppingStops + 1
             );
 
-            stopCount = Mathf.Min(stopCount, shoppingStops.Length);
+            // Only consider shelves that currently have products.
+            List<ReStockShelf> availableShelves = new List<ReStockShelf>();
 
-            // Build a list of valid stops so the customer doesn't
-            // select the same stop more than once.
-            List<Transform> availableStops = new List<Transform>();
-
-            foreach (Transform stop in shoppingStops)
+            foreach (ReStockShelf shelf in shoppingShelves)
             {
-                if (stop != null)
+                if (shelf != null &&
+                    shelf.ShoppingArea != null &&
+                    shelf.AmountOnShelf > 0 &&
+                    shelf.CurrentProductType != null)
                 {
-                    availableStops.Add(stop);
+                    availableShelves.Add(shelf);
                 }
             }
 
-            stopCount = Mathf.Min(stopCount, availableStops.Count);
+            stopCount = Mathf.Min(stopCount, availableShelves.Count);
 
             for (int i = 0; i < stopCount; i++)
             {
-                int randomIndex = Random.Range(0, availableStops.Count);
-                Transform stop = availableStops[randomIndex];
+                if (IsDead || isEvacuating)
+                    yield break;
 
-                availableStops.RemoveAt(randomIndex);
+                int randomIndex = Random.Range(0, availableShelves.Count);
+                ReStockShelf shelf = availableShelves[randomIndex];
 
-                yield return MoveTo(stop.position);
+                // Don't visit the same shelf twice.
+                availableShelves.RemoveAt(randomIndex);
 
-                TryTakeItemFromShelf(stop);
+                if (shelf == null || shelf.AmountOnShelf <= 0)
+                    continue;
+
+                // Find a reachable point inside the shelf's shopping trigger.
+                if (!TryFindShelfApproachPoint(shelf, out Vector3 approachPoint))
+                {
+                    Debug.LogWarning(
+                        $"{name}: Could not find an accessible position at {shelf.name}.",
+                        this
+                    );
+                    continue;
+                }
+
+                yield return MoveTo(approachPoint);
+
+                if (!moveToSucceeded || IsDead || isEvacuating || !IsInsideShoppingZone)
+                {
+                    Debug.LogWarning(
+                        $"{name}: Could not reach shelf {shelf.name}.",
+                        this
+                    );
+                    continue;
+                }
+
+                // Wait briefly for the customer collider to register inside the shelf trigger.
+                float entryTimer = 0f;
+
+                while (!shelf.IsCustomerInside(this) &&
+                    entryTimer < shelfEntryWaitTime &&
+                    !IsDead &&
+                    !isEvacuating)
+                {
+                    entryTimer += Time.deltaTime;
+                    yield return null;
+                }
+
+                if (IsDead || isEvacuating)
+                    yield break;
+
+                if (!shelf.IsCustomerInside(this))
+                {
+                    Debug.LogWarning(
+                        $"{name}: Reached {shelf.name}, but did not enter its shopping area.",
+                        this
+                    );
+                    continue;
+                }
+
+                // Stop moving while browsing.
+                if (agent != null && agent.enabled && agent.isOnNavMesh)
+                {
+                    agent.isStopped = true;
+                    agent.ResetPath();
+                }
+
+                // Browse the shelf.
+                if (animator != null)
+                    animator.SetFloat("Speed", 0f);
+                yield return new WaitForSeconds(browseDuration);
+
+                if (IsDead || isEvacuating)
+                    yield break;
+
+                // Check that the shelf still has stock before attempting to take an item.
+                if (shelf != null &&
+                    shelf.AmountOnShelf > 0 &&
+                    shelf.CurrentProductType != null)
+                {
+                    PlayShoppingGrabAnimation();
+                    yield return new WaitForSeconds(grabDuration);
+
+                    if (IsDead || isEvacuating)
+                        yield break;
+
+                    TryTakeItemFromShelf(shelf);
+                }
+
+                // Resume normal movement for the next shelf.
+                if (agent != null && agent.enabled && agent.isOnNavMesh)
+                    agent.isStopped = false;
 
                 yield return new WaitForSeconds(shoppingWaitTime);
             }
@@ -433,14 +570,12 @@ public class Customer : MonoBehaviour
 
     #region Shopping and Carrying Products
 
-    private void TryTakeItemFromShelf(Transform stop)
+    private void TryTakeItemFromShelf(ReStockShelf shelf)
     {
-        // The stop can be the shelf itself or a child of the shelf.
-        ReStockShelf shelf = stop.GetComponentInParent<ReStockShelf>();
 
         if (shelf == null)
         {
-            Debug.LogWarning($"No ReStockShelf found at shopping stop: {stop.name}");
+            Debug.LogWarning($"{name}: tried to take item from missing shelf");
             return;
         }
 
@@ -655,6 +790,105 @@ public class Customer : MonoBehaviour
         );
     }
 
+    private bool TryFindShelfApproachPoint(
+        ReStockShelf shelf,
+        out Vector3 bestPosition)
+    {
+        bestPosition = Vector3.zero;
+
+        if (shelf == null ||
+            shelf.ShoppingArea == null ||
+            agent == null ||
+            !agent.enabled ||
+            !agent.isOnNavMesh)
+        {
+            return false;
+        }
+
+        Collider area = shelf.ShoppingArea;
+        Bounds bounds = area.bounds;
+
+        float radiusX = bounds.extents.x * 0.8f;
+        float radiusZ = bounds.extents.z * 0.8f;
+
+        float shortestPath = float.MaxValue;
+        bool foundPosition = false;
+
+        int sampleCount = Mathf.Max(4, shelfApproachSamples);
+
+        for (int i = 0; i < sampleCount; i++)
+        {
+            float angle = (i / (float)sampleCount) * Mathf.PI * 2f;
+
+            Vector3 candidate = bounds.center + new Vector3(
+                Mathf.Cos(angle) * radiusX,
+                0f,
+                Mathf.Sin(angle) * radiusZ
+            );
+
+            if (!NavMesh.SamplePosition(
+                    candidate,
+                    out NavMeshHit hit,
+                    shelfNavMeshSampleDistance,
+                    agent.areaMask))
+            {
+                continue;
+            }
+
+            // The sampled position must remain inside the shopping trigger.
+            if (!area.bounds.Contains(hit.position))
+                continue;
+
+            NavMeshPath path = new NavMeshPath();
+
+            if (!agent.CalculatePath(hit.position, path) ||
+                path.status != NavMeshPathStatus.PathComplete)
+            {
+                continue;
+            }
+
+            float pathLength = 0f;
+
+            Vector3[] corners = path.corners;
+
+            for (int corner = 1; corner < corners.Length; corner++)
+            {
+                pathLength += Vector3.Distance(
+                    corners[corner - 1],
+                    corners[corner]
+                );
+            }
+
+            if (pathLength < shortestPath)
+            {
+                shortestPath = pathLength;
+                bestPosition = hit.position;
+                foundPosition = true;
+            }
+        }
+
+        return foundPosition;
+    }
+    private void PlayShoppingGrabAnimation()
+    {
+        if (animator == null)
+        {
+            Debug.LogWarning($"{name}: Animator is missing.");
+            return;
+        }
+
+        animator.ResetTrigger("GrabLow");
+        animator.ResetTrigger("GrabHigh");
+
+        string trigger = Random.value < 0.5f
+            ? "GrabLow"
+            : "GrabHigh";
+
+        Debug.Log($"{name}: Playing pickup animation: {trigger}");
+
+        animator.SetTrigger(trigger);
+    }
+
 
     public void MoveToQueuePosition(Vector3 position)
     {
@@ -688,6 +922,8 @@ public class Customer : MonoBehaviour
         return agent.hasPath &&
                agent.remainingDistance <= arrivalTolerance;
     }
+
+
 
     #endregion
 
@@ -775,33 +1011,49 @@ public class Customer : MonoBehaviour
         return true;
     }
 
+
     public void BeginCustomerCheckout()
     {
+        // Put purchased products on the checkout counter.
+        PlaceItemsOnCounter();
+
+        // If a cashier is assigned, let the employee handle checkout.
+        if (checkoutQueue != null && checkoutQueue.HasCashier)
+        {
+            Debug.Log(
+                $"{name}: Cashier assigned. Waiting for automated checkout.",
+                this
+            );
+
+            return;
+        }
+
+        // Otherwise, use the existing player-operated checkout.
         if (bagSpawn != null)
         {
-            // BagSpawn should spawn/assign this customer's bag here.
             bagSpawn.SetCheckoutCustomer(this);
         }
         else
         {
             Debug.LogWarning(
-                $"{name}: BagSpawn is not assigned. Checkout will remain blocked until a bag is assigned.",
+                $"{name}: BagSpawn is not assigned.",
                 this
             );
         }
 
-        PlaceItemsOnCounter();
-
         if (checkoutUI != null)
         {
-            
             checkoutUI.BeginCheckout(this);
         }
         else
         {
-            Debug.LogError($"{name}: CheckoutUI is not assigned.", this);
+            Debug.LogError(
+                $"{name}: CheckoutUI is not assigned.",
+                this
+            );
         }
     }
+
 
     public void PlaceItemsOnCounter()
     {
@@ -909,6 +1161,16 @@ public class Customer : MonoBehaviour
         );
     }
 
+    public void SetInsideShoppingZone(bool inside)
+    {
+        isInsideShoppingZone = inside;
+
+        if (inside)
+        {
+            Debug.Log($"{name}: Entered the shopping zone.", this);
+        }
+    }
+
     public bool AreAllItemsBagged()
     {
         // A customer with no products has nothing to bag.
@@ -999,9 +1261,9 @@ public class Customer : MonoBehaviour
         exitPoint = point;
     }
 
-    public void SetShoppingStops(Transform[] stops)
+    public void SetShoppingShelves(ReStockShelf[] shelves)
     {
-        shoppingStops = stops;
+        shoppingShelves = shelves;
     }
 
     public void SetCheckoutUI(CheckoutUI ui)
@@ -1027,6 +1289,11 @@ public class Customer : MonoBehaviour
     public void SetBagSpawn(BagSpawn spawner)
     {
         bagSpawn = spawner;
+    }
+
+    public void SetEntrancePoint(Transform point)
+    {
+        entrancePoint = point;
     }
 
     public void JoinFortuneTellingLine()
@@ -1430,6 +1697,61 @@ public class Customer : MonoBehaviour
                 this
             );
         }
+    }
+
+    private void UpdateMessGeneration()
+    {
+        if (IsDead || isEvacuating)
+            return;
+
+        // Possessed customers should not use normal customer behavior.
+        PossessedCustomer possessed =
+            GetComponent<PossessedCustomer>();
+
+        if (possessed != null && possessed.IsPossessed)
+            return;
+
+        if (CurrentState == CustomerState.Leaving ||
+            CurrentState == CustomerState.Entering)
+            return;
+
+        if (MessSpawner.Instance == null)
+            return;
+
+        messTimer -= Time.deltaTime;
+
+        if (messTimer > 0f)
+            return;
+
+        messTimer = Random.Range(
+            minimumMessInterval,
+            maximumMessInterval
+        );
+
+        MessSpawner.Instance.TrySpawnRandomMess(transform.position);
+    }
+
+    public bool BagAllCheckoutItems()
+    {
+        if (checkoutBag == null)
+        {
+            Debug.LogWarning(
+                $"{name}: Cannot bag products. No checkout bag is assigned.",
+                this
+            );
+
+            return false;
+        }
+
+        foreach (GameObject item in purchasedItems)
+        {
+            if (item == null || checkoutBag.ContainsItem(item))
+                continue;
+
+            checkoutBag.AddItem(item);
+        }
+
+        return AreAllItemsBagged();
     }
 
 }

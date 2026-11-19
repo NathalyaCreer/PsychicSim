@@ -24,6 +24,11 @@ public class PlayerPickupDrop : MonoBehaviour
     [SerializeField] private float hammerRepairDistance = 3f;
     [SerializeField] private float hammerHitDelay = 0.2f;
 
+    [Header("Mess Cleaning")]
+    [SerializeField] private float messCleaningDuration = 1f;
+
+    private Coroutine messCleaningCoroutine;
+
     private Coroutine hammerCoroutine;
     public ObjectGrabbable HeldObject => hotbar != null ? hotbar.HeldObject : null;
     private Coroutine baggingCoroutine;
@@ -274,6 +279,7 @@ public class PlayerPickupDrop : MonoBehaviour
     }
 
 
+
     private void UpdateHeldTool()
     {
         ObjectGrabbable held = HeldObject;
@@ -302,14 +308,12 @@ public class PlayerPickupDrop : MonoBehaviour
             ? held.GetComponentInChildren<HammerTool>()
             : null;
 
-        // Stop hammer use if it is no longer being held.
         if (hammer == null && hammerCoroutine != null)
         {
             StopCoroutine(hammerCoroutine);
             hammerCoroutine = null;
         }
 
-        // Start swinging when left-click is pressed.
         if (hammer != null &&
             Input.GetMouseButtonDown(0) &&
             hammerCoroutine == null)
@@ -317,13 +321,42 @@ public class PlayerPickupDrop : MonoBehaviour
             hammerCoroutine = StartCoroutine(HammerUseRoutine(hammer));
         }
 
-        // Stop repairing when left-click is released.
         if (Input.GetMouseButtonUp(0) && hammerCoroutine != null)
         {
             StopCoroutine(hammerCoroutine);
             hammerCoroutine = null;
         }
+
+        // MOP AND TRASH BAG
+        MessCleaningTool cleaningTool = held != null
+            ? held.GetComponentInChildren<MessCleaningTool>()
+            : null;
+
+        // Stop cleaning if the player changes or drops tools.
+        if (cleaningTool == null && messCleaningCoroutine != null)
+        {
+            StopCoroutine(messCleaningCoroutine);
+            messCleaningCoroutine = null;
+        }
+
+        // Start cleaning when left-click is pressed.
+        if (cleaningTool != null &&
+            Input.GetMouseButtonDown(0) &&
+            messCleaningCoroutine == null)
+        {
+            messCleaningCoroutine =
+                StartCoroutine(MessCleaningRoutine(cleaningTool));
+        }
+
+        // Stop cleaning when left-click is released.
+        if (Input.GetMouseButtonUp(0) &&
+            messCleaningCoroutine != null)
+        {
+            StopCoroutine(messCleaningCoroutine);
+            messCleaningCoroutine = null;
+        }
     }
+
 
 
     private IEnumerator HammerUseRoutine(HammerTool hammer)
@@ -523,6 +556,50 @@ public class PlayerPickupDrop : MonoBehaviour
         {
             FurniturePlacementManager.Instance.BeginMovingFurniture(furniture);
         }
+    }
+
+    private IEnumerator MessCleaningRoutine(MessCleaningTool tool)
+    {
+        float elapsedTime = 0f;
+
+        // Require the player to hold left-click.
+        while (Input.GetMouseButton(0) &&
+            elapsedTime < messCleaningDuration)
+        {
+            // Cancel if the player changes tools.
+            if (HeldObject == null ||
+                !tool.transform.IsChildOf(HeldObject.transform) &&
+                tool.transform != HeldObject.transform)
+            {
+                messCleaningCoroutine = null;
+                yield break;
+            }
+
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        // Player released the mouse before finishing.
+        if (!Input.GetMouseButton(0))
+        {
+            messCleaningCoroutine = null;
+            yield break;
+        }
+
+        // Complete the cleaning action.
+        if (tool != null && playerCameraTransform != null)
+        {
+            bool cleaned = tool.TryClean(
+                playerCameraTransform.GetComponent<Camera>()
+            );
+
+            if (cleaned)
+            {
+                Debug.Log("Successfully cleaned mess using: " + tool.Type);
+            }
+        }
+
+        messCleaningCoroutine = null;
     }
 
 

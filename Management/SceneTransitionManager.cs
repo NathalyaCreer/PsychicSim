@@ -1,20 +1,21 @@
 
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using System.Collections;
 
 public class SceneTransitionManager : MonoBehaviour
 {
     public static SceneTransitionManager Instance { get; private set; }
 
+    [Header("Environment Roots")]
+    [SerializeField] private GameObject storeEnvironment;
+    [SerializeField] private GameObject apartmentEnvironment;
+
     [Header("Player")]
-    [SerializeField] private GameObject playerPrefab;
+    [SerializeField] private Transform player;
 
     [Header("Spawn Points")]
-    [SerializeField] private string storeSpawnPoint = "StoreSpawnPoint";
-    [SerializeField] private string apartmentSpawnPoint = "ApartmentSpawnPoint";
+    [SerializeField] private Transform storeSpawnPoint;
+    [SerializeField] private Transform apartmentSpawnPoint;
 
-    private string destinationSpawnPoint;
     private bool isTransitioning;
 
     private void Awake()
@@ -26,80 +27,101 @@ public class SceneTransitionManager : MonoBehaviour
         }
 
         Instance = this;
-        DontDestroyOnLoad(gameObject);
     }
 
-    public void LoadApartment(string sceneName)
+    private void Start()
     {
-        LoadScene(sceneName, apartmentSpawnPoint);
+        if (player == null)
+        {
+            GameObject playerObject =
+                GameObject.FindGameObjectWithTag("Player");
+
+            if (playerObject != null)
+                player = playerObject.transform;
+        }
     }
 
-    public void LoadStore(string sceneName)
+    public void LoadApartment(string unusedSceneName = "")
     {
-        LoadScene(sceneName, storeSpawnPoint);
+        TeleportPlayer(
+            apartmentEnvironment,
+            apartmentSpawnPoint
+        );
     }
 
-    private void LoadScene(string sceneName, string spawnPoint)
+    public void LoadStore(string unusedSceneName = "")
+    {
+        TeleportPlayer(
+            storeEnvironment,
+            storeSpawnPoint
+        );
+    }
+
+    private void TeleportPlayer(
+        GameObject destinationEnvironment,
+        Transform spawnPoint)
     {
         if (isTransitioning)
             return;
 
-        if (playerPrefab == null)
+        if (player == null)
         {
-            Debug.LogError("SceneTransitionManager: Player prefab is missing.");
+            Debug.LogError("SceneTransitionManager: Player is missing.");
             return;
         }
 
-        destinationSpawnPoint = spawnPoint;
+        if (destinationEnvironment == null || spawnPoint == null)
+        {
+            Debug.LogError("SceneTransitionManager: Destination or spawn point is missing.");
+            return;
+        }
+
         isTransitioning = true;
 
-        GameObject currentPlayer = GameObject.FindGameObjectWithTag("Player");
+        // Activate destination and deactivate the other environment.
+        storeEnvironment.SetActive(destinationEnvironment == storeEnvironment);
+        apartmentEnvironment.SetActive(destinationEnvironment == apartmentEnvironment);
 
-        if (currentPlayer != null)
-            Destroy(currentPlayer);
+        // Temporarily deactivate the player.
+        player.gameObject.SetActive(false);
 
-        StartCoroutine(LoadSceneRoutine(sceneName));
-    }
+        // Disable movement components if necessary.
+        CharacterController controller =
+            player.GetComponent<CharacterController>();
 
-    private IEnumerator LoadSceneRoutine(string sceneName)
-    {
-        AsyncOperation operation = SceneManager.LoadSceneAsync(sceneName);
+        UnityEngine.AI.NavMeshAgent agent =
+            player.GetComponent<UnityEngine.AI.NavMeshAgent>();
 
-        if (operation == null)
+        if (agent != null)
         {
-            Debug.LogError($"Could not load scene: {sceneName}");
-            isTransitioning = false;
-            yield break;
+            agent.enabled = false;
         }
 
-        while (!operation.isDone)
-            yield return null;
-
-        Transform spawnPoint = FindSpawnPoint(destinationSpawnPoint);
-
-        if (spawnPoint == null)
-        {
-            Debug.LogError(
-                $"Could not find spawn point: {destinationSpawnPoint}"
-            );
-
-            isTransitioning = false;
-            yield break;
-        }
-
-        Instantiate(
-            playerPrefab,
+        // Teleport while inactive.
+        player.SetPositionAndRotation(
             spawnPoint.position,
             spawnPoint.rotation
         );
 
+        // Synchronize physics transforms.
+        Physics.SyncTransforms();
+
+        // Reactivate the player.
+        player.gameObject.SetActive(true);
+
+        // Restore movement components.
+        if (controller != null)
+            controller.enabled = true;
+
+        if (agent != null)
+        {
+            agent.enabled = true;
+            agent.isStopped = false;
+            agent.ResetPath();
+        }
+
+        Debug.Log($"Player teleported to {player.position}");
+
         isTransitioning = false;
-    }
-
-    private Transform FindSpawnPoint(string pointName)
-    {
-        GameObject point = GameObject.Find(pointName);
-
-        return point != null ? point.transform : null;
     }
 }

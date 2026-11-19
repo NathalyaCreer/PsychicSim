@@ -13,6 +13,13 @@ public enum SkillUpgradeType
 )]
 public class SkillTreeNode : ScriptableObject
 {
+    [Header("Tree Layout")]
+    [SerializeField, Min(0)] private int column;
+    [SerializeField, Min(0)] private int row;
+
+    public int Column => column;
+    public int Row => row;
+    
     [Header("Identity")]
     [SerializeField] private string nodeId;
     [SerializeField] private string displayName;

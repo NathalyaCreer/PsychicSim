@@ -1,7 +1,6 @@
 
 using System;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class WorkShift : MonoBehaviour
 {
@@ -15,16 +14,11 @@ public class WorkShift : MonoBehaviour
 
     public static WorkShift Instance { get; private set; }
 
-    [Header("Scene Names")]
-    [SerializeField] private string storeSceneName = "Store";
-    [SerializeField] private string apartmentSceneName = "Apartment";
-
     [Header("Shift Settings")]
     [SerializeField] private float shiftDurationMinutes = 10f;
 
     public ShiftPhase CurrentPhase { get; private set; } = ShiftPhase.Dawn;
     public int DayNumber { get; private set; } = 1;
-
     public float ShiftTimeRemaining { get; private set; }
 
     public float ShiftProgress01 =>
@@ -36,6 +30,7 @@ public class WorkShift : MonoBehaviour
     public event Action<ShiftPhase> PhaseChanged;
 
     private bool shiftTimerRunning;
+    private bool isTransitioning;
 
     private void Awake()
     {
@@ -61,6 +56,8 @@ public class WorkShift : MonoBehaviour
             ShiftTimeRemaining = 0f;
             shiftTimerRunning = false;
 
+            EmployeeManager.Instance?.PayEmployeesForDay(DayNumber);
+
             if (ReputationSystem.Instance != null)
                 ReputationSystem.Instance.CompleteShift();
 
@@ -71,10 +68,7 @@ public class WorkShift : MonoBehaviour
     public void OpenStore()
     {
         if (CurrentPhase != ShiftPhase.Dawn)
-        {
-            Debug.LogWarning("The store can only be opened at Dawn.");
             return;
-        }
 
         ShiftTimeRemaining = shiftDurationMinutes * 60f;
         shiftTimerRunning = true;
@@ -84,41 +78,51 @@ public class WorkShift : MonoBehaviour
 
     public void GoUpstairs()
     {
-        if (CurrentPhase != ShiftPhase.Dusk)
+        if (CurrentPhase != ShiftPhase.Dusk || isTransitioning)
+            return;
+
+        if (SceneTransitionManager.Instance == null)
         {
-            Debug.LogWarning("The player can only go upstairs after closing.");
+            Debug.LogError("WorkShift: SceneTransitionManager is missing.");
             return;
         }
 
+        isTransitioning = true;
+
+        SceneTransitionManager.Instance.LoadApartment();
+
         SetPhase(ShiftPhase.Afterhours);
 
-        if (SceneTransitionManager.Instance != null)
-            SceneTransitionManager.Instance.LoadApartment(apartmentSceneName);
-        else
-            Debug.LogError("SceneTransitionManager is missing.");
+        isTransitioning = false;
     }
 
     public void SleepAndStartNextDay()
     {
-        if (CurrentPhase != ShiftPhase.Afterhours)
+        if (CurrentPhase != ShiftPhase.Afterhours || isTransitioning)
+            return;
+
+        if (SceneTransitionManager.Instance == null)
         {
-            Debug.LogWarning("The player can only sleep during Afterhours.");
+            Debug.LogError("WorkShift: SceneTransitionManager is missing.");
             return;
         }
 
+        isTransitioning = true;
+
         DayNumber++;
+
+        ReputationSystem.Instance?.BeginNewDay();
+
         ShiftTimeRemaining = 0f;
         shiftTimerRunning = false;
 
-        if (ReputationSystem.Instance != null)
-            ReputationSystem.Instance.BeginNewDay();
+        EmployeeManager.Instance?.GenerateDailyApplicants();
 
         SetPhase(ShiftPhase.Dawn);
 
-        if (SceneTransitionManager.Instance != null)
-            SceneTransitionManager.Instance.LoadStore(storeSceneName);
-        else
-            Debug.LogError("SceneTransitionManager is missing.");
+        SceneTransitionManager.Instance.LoadStore();
+
+        isTransitioning = false;
     }
 
     private void SetPhase(ShiftPhase newPhase)

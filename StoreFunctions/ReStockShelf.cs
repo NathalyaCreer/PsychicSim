@@ -1,11 +1,15 @@
-
 using UnityEngine;
+using UnityEngine.AI;
+using System.Collections;
+using System.Collections.Generic;
 
 public class ReStockShelf : MonoBehaviour
 {
     
-    [Header("Customer Shopping ")]
-    [SerializeField] private Transform shoppingStop;
+    [Header("Customer Shopping Area")]
+    [SerializeField] private Collider shoppingArea;
+
+    public Collider ShoppingArea => shoppingArea;
 
     [Header("Shelf")]
     public Transform[] shelfPositions;
@@ -18,6 +22,17 @@ public class ReStockShelf : MonoBehaviour
     private int shelfFull => shelfPositions != null
         ? shelfPositions.Length
         : 0;
+
+
+    private readonly Dictionary<Customer, int> customersInside = new();
+    private readonly HashSet<Collider> customerCollidersInside = new();
+
+    public bool IsCustomerInside(Customer customer)
+    {
+        return customer != null &&
+            customersInside.TryGetValue(customer, out int count) &&
+            count > 0;
+    }
 
     [Header("Restocking")]
     public float restockInterval = 0.5f;
@@ -35,6 +50,22 @@ public class ReStockShelf : MonoBehaviour
 
     private void Start()
     {
+        
+        if (shoppingArea == null)
+            shoppingArea = GetComponent<Collider>();
+
+        if (shoppingArea == null)
+        {
+            Debug.LogError(
+                $"{name}: No shopping area collider assigned.",
+                this
+            );
+        }
+        else
+        {
+            shoppingArea.isTrigger = true;
+        }
+
         shelfProducts = new GameObject[shelfFull];
 
         // Automatically register the player.
@@ -55,22 +86,8 @@ public class ReStockShelf : MonoBehaviour
             if (currentProductType == null && dropped != null)
                 currentProductType = dropped.ProductData;
         }
-
-        // Register this shelf as a customer shopping destination.
-        if (shoppingStop == null)
-            shoppingStop = transform.Find("ShoppingStop");
-
-        if (shoppingStop != null && CustomerSpawner.Instance != null)
-        {
-            CustomerSpawner.Instance.RegisterShoppingStop(shoppingStop);
-        }
-        else
-        {
-            Debug.LogWarning(
-                $"{name}: No shopping stop assigned or CustomerSpawner missing.",
-                this
-            );
-        }
+        if (CustomerSpawner.Instance != null)
+            CustomerSpawner.Instance.RegisterShelf(this);
     }
 
     private void RegisterPlayer()
@@ -100,13 +117,41 @@ public class ReStockShelf : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
+        {
             playerInRange = true;
+        }
+
+        Customer customer = other.GetComponentInParent<Customer>();
+
+        if (customer != null && customerCollidersInside.Add(other))
+        {
+            if (!customersInside.ContainsKey(customer))
+                customersInside[customer] = 0;
+
+            customersInside[customer]++;
+        }
     }
 
     private void OnTriggerExit(Collider other)
     {
         if (other.CompareTag("Player"))
+        {
             playerInRange = false;
+            restockHoldTimer = 0f;
+        }
+
+        if (!customerCollidersInside.Remove(other))
+            return;
+
+        Customer customer = other.GetComponentInParent<Customer>();
+
+        if (customer == null || !customersInside.ContainsKey(customer))
+            return;
+
+        customersInside[customer]--;
+
+        if (customersInside[customer] <= 0)
+            customersInside.Remove(customer);
     }
 
     private void Update()
@@ -334,12 +379,15 @@ public class ReStockShelf : MonoBehaviour
 
         Debug.Log($"{name}: All stored products were destroyed by fire.", this);
     }
+    private void OnDisable()
+    {
+        customersInside.Clear();
+        customerCollidersInside.Clear();
+    }
 
     private void OnDestroy()
     {
-        if (CustomerSpawner.Instance != null && shoppingStop != null)
-        {
-            CustomerSpawner.Instance.UnregisterShoppingStop(shoppingStop);
-        }
+        if (CustomerSpawner.Instance != null)
+            CustomerSpawner.Instance.UnregisterShelf(this);
     }
 }

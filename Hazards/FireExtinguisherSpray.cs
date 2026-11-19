@@ -7,6 +7,7 @@ public class FireExtinguisherSpray : MonoBehaviour
     [SerializeField] private float amountExtinguishedPerSecond = 1f;
     [SerializeField] private float sprayDistance = 100f;
     [SerializeField] private LayerMask fireLayerMask = ~0;
+    [SerializeField] private Transform sprayOrigin;
 
     [Header("Particles")]
     [SerializeField] private ParticleSystem sprayParticles;
@@ -61,12 +62,17 @@ public class FireExtinguisherSpray : MonoBehaviour
         if (!IsHeld || !IsSpraying)
             return;
 
+        Transform origin = sprayOrigin != null
+            ? sprayOrigin
+            : transform;
+
         if (Physics.Raycast(
-                transform.position,
-                transform.forward,
-                out RaycastHit hit,
-                sprayDistance,
-                fireLayerMask))
+            origin.position,
+            origin.forward,
+            out RaycastHit hit,
+            sprayDistance,
+            fireLayerMask,
+            QueryTriggerInteraction.Collide))
         {
             FireHazard fireHazard =
                 hit.collider.GetComponentInParent<FireHazard>();
